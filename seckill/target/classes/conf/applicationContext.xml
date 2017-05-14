@@ -19,6 +19,7 @@
     
     <bean class="org.ygy.common.validator.FieldValidateAspect"/>
     <bean class="org.ygy.common.validator.DefaultValidateErrorHandler"/> -->
+    <!-- <context:component-scan base-package="org.ygy.common.seckill.controller" /> -->
     
     <mvc:annotation-driven />  
   
