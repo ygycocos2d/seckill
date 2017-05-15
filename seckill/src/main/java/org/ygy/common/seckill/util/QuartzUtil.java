@@ -1,5 +1,7 @@
 package org.ygy.common.seckill.util;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.quartz.Job;
@@ -78,13 +80,13 @@ public class QuartzUtil {
 	
 	/**
 	 * 暂停指定任务
-	 * @param jobName
-	 * @param jobGroup
+	 * @param name
+	 * @param group
 	 * @return
 	 */
-	public static boolean pause(String jobName, String jobGroup) {
+	public static boolean pause(String name, String group) {
 		try {
-			JobKey jobKey = JobKey.jobKey(jobName, jobGroup);
+			JobKey jobKey = JobKey.jobKey(name, group);
 			scheduler.pauseJob(jobKey);
 		} catch (SchedulerException e) {
 			e.printStackTrace();
@@ -95,13 +97,13 @@ public class QuartzUtil {
 	
 	/**
 	 * 恢复被暂停的任务
-	 * @param jobName
-	 * @param jobGroup
+	 * @param name
+	 * @param group
 	 * @return
 	 */
-	public static boolean resume(String jobName, String jobGroup) {
+	public static boolean resume(String name, String group) {
 		try {
-			JobKey jobKey = JobKey.jobKey(jobName, jobGroup);
+			JobKey jobKey = JobKey.jobKey(name, group);
 			scheduler.resumeJob(jobKey);
 		} catch (SchedulerException e) {
 			e.printStackTrace();
@@ -112,13 +114,13 @@ public class QuartzUtil {
 	
 	/**
 	 * 删除任务后，所对应的trigger也将被删除
-	 * @param jobName
-	 * @param jobGroup
+	 * @param name
+	 * @param group
 	 * @return
 	 */
-	public static boolean delete(String jobName, String jobGroup) {
+	public static boolean delete(String name, String group) {
 		try {
-			JobKey jobKey = JobKey.jobKey(jobName, jobGroup);
+			JobKey jobKey = JobKey.jobKey(name, group);
 			return scheduler.deleteJob(jobKey);
 		} catch (SchedulerException e) {
 			e.printStackTrace();
@@ -126,45 +128,33 @@ public class QuartzUtil {
 		}
 	}
 	
+	public static void start() {
+		try {
+			scheduler.start();
+		} catch (SchedulerException e) {
+			e.printStackTrace();
+		} 
+	}
 	
 
 	public static void main(String[] args) {  
-	     
-	     //通过schedulerFactory获取一个调度器  
-	       SchedulerFactory schedulerfactory=new StdSchedulerFactory();  
-	       Scheduler scheduler=null;  
-	       try{  
-//	      通过schedulerFactory获取一个调度器  
-	           scheduler=schedulerfactory.getScheduler();  
-	             
-//	       创建jobDetail实例，绑定Job实现类  
-//	       指明job的名称，所在组的名称，以及绑定job类  
-	           JobDetail job=JobBuilder.newJob(MyJob.class).withIdentity("job1", "jgroup1").build();  
-//	           
-//	             
-////	       定义调度触发规则  
-//	             
-////	      使用simpleTrigger规则  
-//	           Trigger trigger=TriggerBuilder.newTrigger().withIdentity("simpleTrigger", "triggerGroup")  
-//	        		   .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(1).withRepeatCount(8))  
-//	        		   .startNow().build();  
-	        Trigger trigger=TriggerBuilder.newTrigger().withIdentity("simpleTrigger", "triggerGroup")  
-	                        .startAt(new Date(System.currentTimeMillis() + 2000)).build();  
-////	      使用cornTrigger规则  每天10点42分  
-//	              Trigger trigger=TriggerBuilder.newTrigger().withIdentity("simpleTrigger", "triggerGroup")  
-//	              .withSchedule(CronScheduleBuilder.cronSchedule("0 42 10 * * ? *"))  
-//	              .startNow().build();   
-//	             
-//	       把作业和触发器注册到任务调度中  
-	           scheduler.scheduleJob(job, trigger);  
-	             
-//	       启动调度  
-	           scheduler.start();  
-//	             
-//	             
-	       }catch(Exception e){  
-	           e.printStackTrace();  
-	       }  
+	    try {  
+	    	add(MyJob.class, "job1", "group1", 
+	    			new Date(System.currentTimeMillis()+10*1000));
+	    	
+	    	Thread.sleep(5*1000);
+	    	
+//	    	pause("job1", "group1");
+	    	
+	    	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	    	Date date = dateFormat.parse("2017-5-15 22:30:10");
+	    	update("job1", "group1",date);
+	    	
+	    	
+	        scheduler.start();               
+	    } catch(Exception e){  
+	    	e.printStackTrace();  
+	    }  
 	         
 	}  
 }
