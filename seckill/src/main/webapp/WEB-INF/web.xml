@@ -6,11 +6,12 @@
     <param-name>contextConfigLocation</param-name>
     <param-value>
     	classpath:conf/applicationContext.xml,
-    	classpath:conf/spring-mybatis.xml
+    	classpath:conf/spring-mybatis.xml,
+    	classpath:conf/service-config.xml
     </param-value>
   </context-param>
   
-  <!--  -->
+  <!-- 编码过滤器  -->
   <filter>
     <filter-name>encodingFilter</filter-name>
     <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -25,8 +26,31 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
   
+  <!-- qps限制过滤器 -->
+  <filter>
+    <filter-name>qpsLimiterFilter</filter-name>
+    <filter-class>org.ygy.common.seckill.qpsLimiter.QPSLimiterFilter</filter-class>
+    <init-param>
+      <param-name>qpsln</param-name>
+      <param-value>600</param-value>
+    </init-param>
+  </filter>
+  <!-- <filter-mapping>
+    <filter-name>qpsLimiterFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping> -->
   
-  <!--  -->
+  <!-- 秒杀接口时间限制过滤器  -->
+  <filter>
+    <filter-name>timeLimitFilter</filter-name>
+    <filter-class>org.ygy.common.seckill.timeLimiter.TimeLimitFilter</filter-class>
+  </filter>
+<!--   <filter-mapping>
+    <filter-name>timeLimitFilter</filter-name>
+    <url-pattern>/test/add</url-pattern>
+  </filter-mapping> -->
+  
+  <!-- spring mvc  -->
   <listener>    
         <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>    
   </listener>

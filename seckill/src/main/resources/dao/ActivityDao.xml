@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.ygy.common.seckill.dao.ActivityDao" >
+  <resultMap id="BaseResultMap" type="org.ygy.common.seckill.entity.ActivityEntity" >
+    <id column="activity_id" property="activityId" jdbcType="VARCHAR" />
+    <result column="group_id" property="groupId" jdbcType="VARCHAR" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+    <result column="goods_price" property="goodsPrice" jdbcType="INTEGER" />
+    <result column="goods_number" property="goodsNumber" jdbcType="INTEGER" />
+    <result column="left_goods_number" property="leftGoodsNumber" jdbcType="INTEGER" />
+    <result column="limit_number" property="limitNumber" jdbcType="INTEGER" />
+    <result column="pay_delay" property="payDelay" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="describt" property="describt" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    activity_id, group_id, start_time, end_time, goods_id, goods_price, goods_number, 
+    left_goods_number, limit_number, pay_delay, status, describt
+  </sql>
+  <!--  -->
+  <select id="getAllEffectiveActivity" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from activity
+    where status = '0' and start_time > CURTIME() and end_time > start_time
+    order by start_time asc
+  </select>
+  
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from activity
+    where activity_id = #{activityId,jdbcType=VARCHAR} and start_time > CURTIME()
+  </select>
+  
+  <select id="getByTime" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from activity
+    where
+    <if test="activityId != null" >
+        activity_id != #{activityId,jdbcType=VARCHAR} and 
+    </if> 
+    (
+    ( #{startTime,jdbcType=TIMESTAMP} >= start_time and end_time >= #{startTime,jdbcType=TIMESTAMP} )
+    or 
+    ( #{endTime,jdbcType=TIMESTAMP} >= start_time and end_time >= #{endTime,jdbcType=TIMESTAMP} )
+    )
+    limit 1
+  </select>
+  
+  <!-- 工具生成如下  -->
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from activity
+    where activity_id = #{activityId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from activity
+    where activity_id = #{activityId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="org.ygy.common.seckill.entity.ActivityEntity" >
+    insert into activity (activity_id, group_id, start_time, 
+      end_time, goods_id, goods_price, 
+      goods_number, left_goods_number, limit_number, 
+      pay_delay, status, describt
+      )
+    values (#{activityId,jdbcType=VARCHAR}, #{groupId,jdbcType=VARCHAR}, #{startTime,jdbcType=TIMESTAMP}, 
+      #{endTime,jdbcType=TIMESTAMP}, #{goodsId,jdbcType=VARCHAR}, #{goodsPrice,jdbcType=INTEGER}, 
+      #{goodsNumber,jdbcType=INTEGER}, #{leftGoodsNumber,jdbcType=INTEGER}, #{limitNumber,jdbcType=INTEGER}, 
+      #{payDelay,jdbcType=INTEGER}, #{status,jdbcType=CHAR}, #{describt,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="org.ygy.common.seckill.entity.ActivityEntity" >
+    insert into activity
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="activityId != null" >
+        activity_id,
+      </if>
+      <if test="groupId != null" >
+        group_id,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="goodsId != null" >
+        goods_id,
+      </if>
+      <if test="goodsPrice != null" >
+        goods_price,
+      </if>
+      <if test="goodsNumber != null" >
+        goods_number,
+      </if>
+      <if test="leftGoodsNumber != null" >
+        left_goods_number,
+      </if>
+      <if test="limitNumber != null" >
+        limit_number,
+      </if>
+      <if test="payDelay != null" >
+        pay_delay,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="describt != null" >
+        describt,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="activityId != null" >
+        #{activityId,jdbcType=VARCHAR},
+      </if>
+      <if test="groupId != null" >
+        #{groupId,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="goodsId != null" >
+        #{goodsId,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsPrice != null" >
+        #{goodsPrice,jdbcType=INTEGER},
+      </if>
+      <if test="goodsNumber != null" >
+        #{goodsNumber,jdbcType=INTEGER},
+      </if>
+      <if test="leftGoodsNumber != null" >
+        #{leftGoodsNumber,jdbcType=INTEGER},
+      </if>
+      <if test="limitNumber != null" >
+        #{limitNumber,jdbcType=INTEGER},
+      </if>
+      <if test="payDelay != null" >
+        #{payDelay,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="describt != null" >
+        #{describt,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.ygy.common.seckill.entity.ActivityEntity" >
+    update activity
+    <set >
+      <if test="groupId != null" >
+        group_id = #{groupId,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="goodsId != null" >
+        goods_id = #{goodsId,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsPrice != null" >
+        goods_price = #{goodsPrice,jdbcType=INTEGER},
+      </if>
+      <if test="goodsNumber != null" >
+        goods_number = #{goodsNumber,jdbcType=INTEGER},
+      </if>
+      <if test="leftGoodsNumber != null" >
+        left_goods_number = #{leftGoodsNumber,jdbcType=INTEGER},
+      </if>
+      <if test="limitNumber != null" >
+        limit_number = #{limitNumber,jdbcType=INTEGER},
+      </if>
+      <if test="payDelay != null" >
+        pay_delay = #{payDelay,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=CHAR},
+      </if>
+      <if test="describt != null" >
+        describt = #{describt,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where activity_id = #{activityId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.ygy.common.seckill.entity.ActivityEntity" >
+    update activity
+    set group_id = #{groupId,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      goods_id = #{goodsId,jdbcType=VARCHAR},
+      goods_price = #{goodsPrice,jdbcType=INTEGER},
+      goods_number = #{goodsNumber,jdbcType=INTEGER},
+      left_goods_number = #{leftGoodsNumber,jdbcType=INTEGER},
+      limit_number = #{limitNumber,jdbcType=INTEGER},
+      pay_delay = #{payDelay,jdbcType=INTEGER},
+      status = #{status,jdbcType=CHAR},
+      describt = #{describt,jdbcType=VARCHAR}
+    where activity_id = #{activityId,jdbcType=VARCHAR}
+  </update>
+</mapper>

@@ -9,6 +9,16 @@
   <sql id="Base_Column_List" >
     user_id, user_account, user_pwd
   </sql>
+  
+  <!--  -->
+  <select id="getByAccount" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from user
+    where user_account = #{userAccount,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 工具生成如下 -->
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />

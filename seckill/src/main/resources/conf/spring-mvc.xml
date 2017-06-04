@@ -20,7 +20,6 @@
     <!-- <context:component-scan base-package="com.danlu.aoptest" /> -->
     <!-- <context:component-scan base-package="org.ygy.common.seckill.controller" /> -->
     
-    
     <!--避免IE执行AJAX时，返回JSON出现下载文件 -->  
     <bean id="mappingJacksonHttpMessageConverter"  
         class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">  

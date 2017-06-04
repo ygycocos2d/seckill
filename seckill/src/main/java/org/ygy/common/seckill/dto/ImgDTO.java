@@ -1,6 +1,6 @@
-package org.ygy.common.seckill.entity;
+package org.ygy.common.seckill.dto;
 
-public class ImgEntity {
+public class ImgDTO {
     private String imgId;
 
     private String activityId;

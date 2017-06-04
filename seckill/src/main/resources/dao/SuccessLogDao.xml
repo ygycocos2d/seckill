@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.ygy.common.seckill.dao.SuccessLogDao" >
+  <resultMap id="BaseResultMap" type="org.ygy.common.seckill.entity.SuccessLogEntity" >
+    <id column="succlog_id" property="succlogId" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="activity_id" property="activityId" jdbcType="VARCHAR" />
+    <result column="goods_number" property="goodsNumber" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    succlog_id, user_id, activity_id, goods_number, create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from success_log
+    where succlog_id = #{succlogId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from success_log
+    where succlog_id = #{succlogId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="org.ygy.common.seckill.entity.SuccessLogEntity" >
+    insert into success_log (succlog_id, user_id, activity_id, 
+      goods_number, create_time)
+    values (#{succlogId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{activityId,jdbcType=VARCHAR}, 
+      #{goodsNumber,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="org.ygy.common.seckill.entity.SuccessLogEntity" >
+    insert into success_log
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="succlogId != null" >
+        succlog_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="activityId != null" >
+        activity_id,
+      </if>
+      <if test="goodsNumber != null" >
+        goods_number,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="succlogId != null" >
+        #{succlogId,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="activityId != null" >
+        #{activityId,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsNumber != null" >
+        #{goodsNumber,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.ygy.common.seckill.entity.SuccessLogEntity" >
+    update success_log
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="activityId != null" >
+        activity_id = #{activityId,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsNumber != null" >
+        goods_number = #{goodsNumber,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where succlog_id = #{succlogId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.ygy.common.seckill.entity.SuccessLogEntity" >
+    update success_log
+    set user_id = #{userId,jdbcType=VARCHAR},
+      activity_id = #{activityId,jdbcType=VARCHAR},
+      goods_number = #{goodsNumber,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where succlog_id = #{succlogId,jdbcType=VARCHAR}
+  </update>
+</mapper>

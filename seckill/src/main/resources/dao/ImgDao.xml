@@ -3,11 +3,12 @@
 <mapper namespace="org.ygy.common.seckill.dao.ImgDao" >
   <resultMap id="BaseResultMap" type="org.ygy.common.seckill.entity.ImgEntity" >
     <id column="img_id" property="imgId" jdbcType="VARCHAR" />
-    <result column="task_Id" property="taskId" jdbcType="VARCHAR" />
+    <result column="activity_id" property="activityId" jdbcType="VARCHAR" />
     <result column="img_url" property="imgUrl" jdbcType="VARCHAR" />
+    <result column="img_type" property="imgType" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    img_id, task_Id, img_url
+    img_id, activity_id, img_url, img_type
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -20,10 +21,10 @@
     where img_id = #{imgId,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="org.ygy.common.seckill.entity.ImgEntity" >
-    insert into img (img_id, task_Id, img_url
-      )
-    values (#{imgId,jdbcType=VARCHAR}, #{taskId,jdbcType=VARCHAR}, #{imgUrl,jdbcType=VARCHAR}
-      )
+    insert into img (img_id, activity_id, img_url, 
+      img_type)
+    values (#{imgId,jdbcType=VARCHAR}, #{activityId,jdbcType=VARCHAR}, #{imgUrl,jdbcType=VARCHAR}, 
+      #{imgType,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="org.ygy.common.seckill.entity.ImgEntity" >
     insert into img
@@ -31,41 +32,51 @@
       <if test="imgId != null" >
         img_id,
       </if>
-      <if test="taskId != null" >
-        task_Id,
+      <if test="activityId != null" >
+        activity_id,
       </if>
       <if test="imgUrl != null" >
         img_url,
+      </if>
+      <if test="imgType != null" >
+        img_type,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="imgId != null" >
         #{imgId,jdbcType=VARCHAR},
       </if>
-      <if test="taskId != null" >
-        #{taskId,jdbcType=VARCHAR},
+      <if test="activityId != null" >
+        #{activityId,jdbcType=VARCHAR},
       </if>
       <if test="imgUrl != null" >
         #{imgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="imgType != null" >
+        #{imgType,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="org.ygy.common.seckill.entity.ImgEntity" >
     update img
     <set >
-      <if test="taskId != null" >
-        task_Id = #{taskId,jdbcType=VARCHAR},
+      <if test="activityId != null" >
+        activity_id = #{activityId,jdbcType=VARCHAR},
       </if>
       <if test="imgUrl != null" >
         img_url = #{imgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="imgType != null" >
+        img_type = #{imgType,jdbcType=VARCHAR},
       </if>
     </set>
     where img_id = #{imgId,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="org.ygy.common.seckill.entity.ImgEntity" >
     update img
-    set task_Id = #{taskId,jdbcType=VARCHAR},
-      img_url = #{imgUrl,jdbcType=VARCHAR}
+    set activity_id = #{activityId,jdbcType=VARCHAR},
+      img_url = #{imgUrl,jdbcType=VARCHAR},
+      img_type = #{imgType,jdbcType=VARCHAR}
     where img_id = #{imgId,jdbcType=VARCHAR}
   </update>
 </mapper>
