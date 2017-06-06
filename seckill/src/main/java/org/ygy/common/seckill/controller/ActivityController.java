@@ -24,6 +24,22 @@ import org.ygy.common.seckill.util.AtomicIntegerExt;
 import org.ygy.common.seckill.util.Constant;
 import org.ygy.common.seckill.util.StringUtil;
 
+/**
+ * 规定：
+ * 1、状态为启动时，进行商品校验（该示例只进行库存校验和减库存操作）
+ * 		所以增加、更新活动时，要判断状态。
+ * 		如果增加时状态置为启动，则最后要减库存
+ * 		如果修改时状态由停止转为启动，也要减库存
+ * 2、状态为停止或删除，或者秒杀活动结束，进行还库存
+ * 3、状态可以在启动停止间切换，也可以由启动、停止切到删除，但一旦删除便不能在对活动进行任何操作，包括状态修改
+ * 4、总开关开启时，将所有状态为启动且为到开始时间的活动加入活动队列，并取出第一个加入调度队列开始调度
+ * 5、总开关关闭时，清空活动队列；调度队列中，正在进行中的活动的调度任务不删除，其他删除
+ * 
+ * 注：1、对活动的所有操作的前提是---总开关是关闭状态
+ * 	  2、总开关开启后，说明整个秒杀调度开始啦，最好不要再操作活动信息
+ * @author gy
+ *
+ */
 @Controller
 @RequestMapping("activity")
 public class ActivityController {
@@ -113,7 +129,7 @@ public class ActivityController {
 		Map<String,Object> result = new HashMap<String,Object>();
 		if ( !StringUtil.contains(Constant.ACTIVITY_STATUS, status)) {
 			result.put("status", 1);
-			result.put("msg", "参数不合法");
+			result.put("msg", "状态参数不合法");
 			return result;
 		} 
 		try {
