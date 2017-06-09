@@ -30,7 +30,7 @@ import org.ygy.common.seckill.util.StringUtil;
  * 		所以增加、更新活动时，要判断状态。
  * 		如果增加时状态置为启动，则最后要减库存
  * 		如果修改时状态由停止转为启动，也要减库存
- * 2、状态为停止或删除，或者秒杀活动结束，进行还库存
+ * 2、状态由启动变为停止或删除，或者秒杀活动结束，进行还库存
  * 3、状态可以在启动停止间切换，也可以由启动、停止切到删除，但一旦删除便不能在对活动进行任何操作，包括状态修改
  * 4、总开关开启时，将所有状态为启动且为到开始时间的活动加入活动队列，并取出第一个加入调度队列开始调度
  * 5、总开关关闭时，清空活动队列；调度队列中，正在进行中的活动的调度任务不删除，其他删除
@@ -127,6 +127,11 @@ public class ActivityController {
 	@ResponseBody
 	public Map<String,Object> updateStatus(String activityIdList, String status) {
 		Map<String,Object> result = new HashMap<String,Object>();
+		if (SchedulerContext.getMasterSwitch()) {
+			result.put("status", 2);
+			result.put("msg", "调度总开关已开启，当前操作不合法");
+			return result;
+		}
 		if ( !StringUtil.contains(Constant.ACTIVITY_STATUS, status)) {
 			result.put("status", 1);
 			result.put("msg", "状态参数不合法");
@@ -136,24 +141,28 @@ public class ActivityController {
 			String[] ids = activityIdList.split(",");
 			// 获取所有有效的且可修改状态的秒杀活动
 			for (String id:ids) {
-				// 如果status为启动且未加入调度队列，则加入秒杀活动调度队列
-				if (status.equals(Constant.ACTIVITY_STATUS_START)) {
-					if (!ActivityQueue.exist(id)) {
-						ActivityEntity entity = this.activityService.getEffectiveActivityById(id);
-						if (null != entity) {
-							entity.setStatus(status);
-							this.activityService.update(entity);
-							ActivityQueue.add(entity);
+				ActivityEntity activity = this.activityService.getEffectiveActivityById(id);
+				if (null != activity) {
+					activity.setStatus(status);
+					//暂停-->启动，减库存
+					if ("1".equals(activity.getStatus()) && "0".equals(status)) {
+						GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
+						if (activity.getGoodsNumber() <= goods.getGoodsNumber()) {
+							goods.setGoodsNumber(goods.getGoodsNumber()-activity.getGoodsNumber());
+							this.goodsService.update(goods);
+							this.activityService.update(activity);
 						}
 					}
-				} else {//如果status为停止或删除，则从调度队列中移除秒杀活动
-					if (ActivityQueue.exist(id)) {
-						ActivityEntity entity = this.activityService.getEffectiveActivityById(id);
-						if (null != entity) {
-							entity.setStatus(status);
-							this.activityService.update(entity);
-							ActivityQueue.delete(id);
-						}
+					//启动-->暂停、删除，还库存
+					else if ("0".equals(activity.getStatus()) && !"0".equals(status)) {
+						GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
+						goods.setGoodsNumber(goods.getGoodsNumber()+activity.getGoodsNumber());
+						this.goodsService.update(goods);
+						this.activityService.update(activity);
+					}
+					//暂停-->删除
+					else {
+						this.activityService.update(activity);
 					}
 				}
 			}
@@ -258,16 +267,21 @@ public class ActivityController {
 	@RequestMapping("addActivity")
 	@ResponseBody
 	public Map<String,Object> addActivity(@RequestBody ActivityDTO dto) {
-		Map<String,Object> result = this.validateActivity(dto);
+		Map<String,Object> result = this.validateActivity(dto,true);
 		try {
 			//校通过验
 			if (0 == (Integer)result.get("status")) {
-				ActivityEntity entity = new ActivityEntity();
-				this.dto2ActivityEntity(dto, entity);
-				entity.setActivityId(StringUtil.getUUID());
-				entity.setGroupId(StringUtil.getUUID());
-				this.activityService.add(entity);
-				result.put("status", 0);
+				ActivityEntity activity = new ActivityEntity();
+				this.dto2ActivityEntity(dto, activity);
+				activity.setActivityId(StringUtil.getUUID());
+				activity.setGroupId(StringUtil.getUUID());
+				if (Constant.ACTIVITY_STATUS_START.equals(dto.getStatus())) {
+					GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
+					goods.setGoodsNumber(goods.getGoodsNumber()-activity.getGoodsNumber());
+					this.goodsService.update(goods);
+					this.activityService.add(activity);
+				}
+				this.activityService.add(activity);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -285,7 +299,7 @@ public class ActivityController {
 	@RequestMapping("updateActivity")
 	@ResponseBody
 	public Map<String,Object> updateActivity(@RequestBody ActivityDTO dto) {
-		Map<String,Object> result = this.validateActivity(dto);
+		Map<String,Object> result = this.validateActivity(dto,false);
 		try {
 			//校通过验
 			if (0 == (Integer)result.get("status")) {
@@ -294,8 +308,24 @@ public class ActivityController {
 					if (en.getStartTime().compareTo(new Date()) > 0 && !"2".equals(en.getStatus())) {
 						ActivityEntity entity = new ActivityEntity();
 						this.dto2ActivityEntity(dto, entity);
-						this.activityService.update(entity);
-						result.put("status", 0);
+						//暂停-->启动，减库存
+						if ("1".equals(en.getStatus()) && "0".equals(entity.getStatus())) {
+							GoodsEntity goods = this.goodsService.getGoodsById(entity.getGoodsId());
+							goods.setGoodsNumber(goods.getGoodsNumber()-entity.getGoodsNumber());
+							this.goodsService.update(goods);
+							this.activityService.update(entity);
+						} 
+						//启动-->暂停、删除，还库存
+						else if ("0".equals(en.getStatus()) && !"0".equals(entity.getStatus())) {
+							GoodsEntity goods = this.goodsService.getGoodsById(entity.getGoodsId());
+							goods.setGoodsNumber(goods.getGoodsNumber()+entity.getGoodsNumber());
+							this.goodsService.update(goods);
+							this.activityService.update(entity);
+						} 
+						//暂停-->删除
+						else {
+							this.activityService.update(entity);
+						}
 					} else {
 						result.put("status", 1);
 						result.put("msg", "该活动已过期或删除");
@@ -336,13 +366,29 @@ public class ActivityController {
 	/**
 	 * 校验新增、修改活动时活动设置的正确性
 	 * @param dto
+	 * @param isAdd 
 	 * @return
 	 */
-	private Map<String,Object> validateActivity(ActivityDTO dto) {
+	private Map<String,Object> validateActivity(ActivityDTO dto, boolean isAdd) {
 		Map<String,Object> result = new HashMap<String,Object>();
 		// 校验通过
 		result.put("status", 0);
 		try {
+			if (null == dto) {
+				result.put("status", 1);
+				result.put("msg", "参数不能为空");
+				return result;
+			}
+			if (!StringUtil.contains(Constant.ACTIVITY_STATUS, dto.getStatus())) {
+				result.put("status", 1);
+				result.put("msg", "状态参数不合法");
+				return result;
+			}
+			if (isAdd && Constant.ACTIVITY_STATUS_DELETE.equals(dto.getStatus())) {
+				result.put("status", 1);
+				result.put("msg", "新增活动，状态不能为删除状态");
+				return result;
+			}
 			// 开始时间要大于当前时间
 			if (null == dto || null == dto.getStartTime() || 
 					dto.getStartTime() <= System.currentTimeMillis() ) {
