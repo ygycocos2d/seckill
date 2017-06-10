@@ -67,17 +67,10 @@ public class ActivityServiceImpl implements ActivityService {
 		return this.activityDao.getByTime(param);
 	}
 
-//	/**
-//	 * 记得加事务
-//	 */
 	@Override
 	public void add(ActivityEntity entity) {
 		if (null != entity) {
 			this.activityDao.insertSelective(entity);
-			// 商品减库存
-//			GoodsEntity goods = this.goodsDao.selectByPrimaryKey(entity.getGoodsId());
-//			goods.setGoodsNumber(goods.getGoodsNumber() - entity.getGoodsNumber());
-//			this.goodsDao.updateByPrimaryKey(goods);
 		}
 	}
 
@@ -85,6 +78,24 @@ public class ActivityServiceImpl implements ActivityService {
 	public void update(ActivityEntity entity) {
 		if (null != entity) {
 			this.activityDao.updateByPrimaryKeySelective(entity);
+		}
+	}
+
+	//记得加事务
+	@Override
+	public void updateActivityAndGoods(ActivityEntity activity, GoodsEntity goods) {
+		if (null != activity && null != goods) {
+			this.activityDao.updateByPrimaryKeySelective(activity);
+			this.goodsDao.updateByPrimaryKeySelective(goods);
+		}
+	}
+
+	//记得加事务
+	@Override
+	public void addActivityAndUpdateGoods(ActivityEntity activity, GoodsEntity goods) {
+		if (null != activity && null != goods) {
+			this.activityDao.insertSelective(activity);
+			this.goodsDao.updateByPrimaryKeySelective(goods);
 		}
 	}
 

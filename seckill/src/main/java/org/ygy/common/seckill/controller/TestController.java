@@ -10,14 +10,34 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.ygy.common.seckill.scheduler.SchedulerContext;
 import org.ygy.common.seckill.util.MyJob;
 
+import com.alibaba.fastjson.JSONObject;
+
 @Controller
 @RequestMapping("test")
 public class TestController {
+	
+	@RequestMapping("testJsonObject")
+	@ResponseBody
+	public Map<String,Object> testJsonObject(@RequestBody JSONObject param) {
+		System.out.println("---------------------" + param.get("name"));
+		Map<String,Object> result = new HashMap<String,Object>();
+		result.put("status", 0);
+		return result;
+	}
+	
+	public Person getPerson(@RequestBody Person p) {
+		return p;
+	}
+	
+	
+	
+	
 	
 	@RequestMapping("add")
 	@ResponseBody

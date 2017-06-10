@@ -19,7 +19,7 @@ public class StartJob implements Job {
 		String name = info.getActivityId() + "_end";
 		String group = info.getActivityGid() + "_end";
 		Date date = new Date(info.getEndTime() + 1000);//活动结束一秒后执行
-		SchedulerContext.add(EndJob.class, name, group, date);
+		SchedulerContext.getQuartzUtil().add(EndJob.class, name, group, date);
 	}
 
 }

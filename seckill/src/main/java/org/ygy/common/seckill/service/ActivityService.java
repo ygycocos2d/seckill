@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.ygy.common.seckill.entity.ActivityEntity;
+import org.ygy.common.seckill.entity.GoodsEntity;
 
 public interface ActivityService {
 
@@ -32,5 +33,19 @@ public interface ActivityService {
 	void add(ActivityEntity entity);
 
 	void update(ActivityEntity entity);
+
+	/**
+	 * 更新活动信息同时更新商品库存
+	 * @param activity
+	 * @param goods
+	 */
+	void updateActivityAndGoods(ActivityEntity activity, GoodsEntity goods);
+
+	/**
+	 * 增加活动同时更新商品库存
+	 * @param activity
+	 * @param goods
+	 */
+	void addActivityAndUpdateGoods(ActivityEntity activity, GoodsEntity goods);
 
 }

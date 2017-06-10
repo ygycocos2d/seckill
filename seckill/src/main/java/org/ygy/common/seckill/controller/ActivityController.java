@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.ygy.common.seckill.dto.ActivityDTO;
 import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.entity.GoodsEntity;
-import org.ygy.common.seckill.scheduler.ActivityQueue;
 import org.ygy.common.seckill.scheduler.ActivityInfo;
 import org.ygy.common.seckill.scheduler.SchedulerContext;
 import org.ygy.common.seckill.service.ActivityService;
 import org.ygy.common.seckill.service.GoodsService;
+import org.ygy.common.seckill.util.ActivityQueue;
 import org.ygy.common.seckill.util.AtomicIntegerExt;
 import org.ygy.common.seckill.util.Constant;
 import org.ygy.common.seckill.util.StringUtil;
@@ -37,7 +37,7 @@ import org.ygy.common.seckill.util.StringUtil;
  * 
  * 注：1、对活动的所有操作的前提是---总开关是关闭状态
  * 	  2、总开关开启后，说明整个秒杀调度开始啦，最好不要再操作活动信息
- * @author gy
+ * @author ygy
  *
  */
 @Controller
@@ -149,16 +149,14 @@ public class ActivityController {
 						GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
 						if (activity.getGoodsNumber() <= goods.getGoodsNumber()) {
 							goods.setGoodsNumber(goods.getGoodsNumber()-activity.getGoodsNumber());
-							this.goodsService.update(goods);
-							this.activityService.update(activity);
+							this.activityService.updateActivityAndGoods(activity,goods);
 						}
 					}
 					//启动-->暂停、删除，还库存
 					else if ("0".equals(activity.getStatus()) && !"0".equals(status)) {
 						GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
 						goods.setGoodsNumber(goods.getGoodsNumber()+activity.getGoodsNumber());
-						this.goodsService.update(goods);
-						this.activityService.update(activity);
+						this.activityService.updateActivityAndGoods(activity,goods);
 					}
 					//暂停-->删除
 					else {
@@ -174,11 +172,22 @@ public class ActivityController {
 		}
 		return result;
 	}
-	
+
+	/**
+	 * 为当前应用分配秒杀商品数（当为集群部署时）
+	 * @param activityId
+	 * @param number
+	 * @return
+	 */
 	@RequestMapping("setGoodsNumForCurApp")
 	@ResponseBody
 	public Map<String,Object> setGoodsNumForCurApp(String activityId, Integer number) {
 		Map<String,Object> result = new HashMap<String,Object>();
+//		if (SchedulerContext.getMasterSwitch()) {
+//			result.put("status", 2);
+//			result.put("msg", "调度总开关已开启，当前操作不合法");
+//			return result;
+//		}
 		if ( StringUtil.isEmpty(activityId) || null == number || number <= 0) {
 			result.put("status", 1);
 			result.put("msg", "参数不合法");
@@ -231,10 +240,10 @@ public class ActivityController {
 			List<ActivityEntity> activityList = this.activityService.getAllEffectiveActivity();
 			if (null != activityList && !activityList.isEmpty()) {
 				// 将有效的秒杀活动放入优先级队列
-				ActivityQueue.addAll(activityList);
-				// 将最早的秒杀活动进行定时调度
+				SchedulerContext.getActivityQueue().addAll(activityList);
+				// 秒杀活动定时调度链启动
 				SchedulerContext.scheduleChainStart();
-				//记录下总开关状态
+				// 记录下总开关状态
 				SchedulerContext.setMasterSwitch(true);
 			} else {
 				result.put("msg", "没有任何有效的秒杀活动");
@@ -255,9 +264,9 @@ public class ActivityController {
 			result.put("msg", "调度总开关已关闭");
 		} else {
 			// 清空秒杀活动优先级队列
-			ActivityQueue.removeAll();
-			// 清空调度器中还没执行的任务
-			
+			SchedulerContext.getActivityQueue().removeAll();
+			// 清空调度器中还没执行的活动的任务
+			this.clearNoExecutedJobFromScheduler();
 			// 记录下总开关状态
 			SchedulerContext.setMasterSwitch(false);
 		}
@@ -278,8 +287,7 @@ public class ActivityController {
 				if (Constant.ACTIVITY_STATUS_START.equals(dto.getStatus())) {
 					GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
 					goods.setGoodsNumber(goods.getGoodsNumber()-activity.getGoodsNumber());
-					this.goodsService.update(goods);
-					this.activityService.add(activity);
+					this.activityService.addActivityAndUpdateGoods(activity,goods);
 				}
 				this.activityService.add(activity);
 			}
@@ -306,25 +314,23 @@ public class ActivityController {
 				ActivityEntity en = this.activityService.getEntityById(dto.getActivityId());
 				if (en != null) {
 					if (en.getStartTime().compareTo(new Date()) > 0 && !"2".equals(en.getStatus())) {
-						ActivityEntity entity = new ActivityEntity();
-						this.dto2ActivityEntity(dto, entity);
+						ActivityEntity activity = new ActivityEntity();
+						this.dto2ActivityEntity(dto, activity);
 						//暂停-->启动，减库存
-						if ("1".equals(en.getStatus()) && "0".equals(entity.getStatus())) {
-							GoodsEntity goods = this.goodsService.getGoodsById(entity.getGoodsId());
-							goods.setGoodsNumber(goods.getGoodsNumber()-entity.getGoodsNumber());
-							this.goodsService.update(goods);
-							this.activityService.update(entity);
+						if ("1".equals(en.getStatus()) && "0".equals(activity.getStatus())) {
+							GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
+							goods.setGoodsNumber(goods.getGoodsNumber()-activity.getGoodsNumber());
+							this.activityService.updateActivityAndGoods(activity,goods);
 						} 
 						//启动-->暂停、删除，还库存
-						else if ("0".equals(en.getStatus()) && !"0".equals(entity.getStatus())) {
-							GoodsEntity goods = this.goodsService.getGoodsById(entity.getGoodsId());
-							goods.setGoodsNumber(goods.getGoodsNumber()+entity.getGoodsNumber());
-							this.goodsService.update(goods);
-							this.activityService.update(entity);
+						else if ("0".equals(en.getStatus()) && !"0".equals(activity.getStatus())) {
+							GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
+							goods.setGoodsNumber(goods.getGoodsNumber()+activity.getGoodsNumber());
+							this.activityService.updateActivityAndGoods(activity,goods);
 						} 
 						//暂停-->删除
 						else {
-							this.activityService.update(entity);
+							this.activityService.update(activity);
 						}
 					} else {
 						result.put("status", 1);
@@ -374,6 +380,11 @@ public class ActivityController {
 		// 校验通过
 		result.put("status", 0);
 		try {
+			if (SchedulerContext.getMasterSwitch()) {
+				result.put("status", 2);
+				result.put("msg", "调度总开关已开启，当前操作不合法");
+				return result;
+			}
 			if (null == dto) {
 				result.put("status", 1);
 				result.put("msg", "参数不能为空");
@@ -450,7 +461,15 @@ public class ActivityController {
 			entity.setPayDelay(dto.getPayDelay());
 			entity.setStatus(dto.getStatus());
 		}
-		
+	}
+
+	private void clearNoExecutedJobFromScheduler() {
+		ActivityInfo curActivityInfo = SchedulerContext.getCurActivityInfo();
+		if (null != curActivityInfo && curActivityInfo.getStartTime() > System.currentTimeMillis()) {
+			String name = curActivityInfo.getActivityId() + "_end";
+			String group = curActivityInfo.getActivityGid() + "_end";
+			SchedulerContext.getQuartzUtil().delete(name, group);
+		}
 	}
 	
 }

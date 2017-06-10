@@ -13,6 +13,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.entity.SuccessLogEntity;
+import org.ygy.common.seckill.util.ActivityQueue;
 import org.ygy.common.seckill.util.StringUtil;
 
 public class EndJob implements Job {
@@ -23,7 +24,7 @@ public class EndJob implements Job {
 		ActivityInfo tempInfo = SchedulerContext.getCurActivityInfo();
 		
 		
-		ActivityEntity entity = ActivityQueue.getHeader();
+		ActivityEntity entity = SchedulerContext.getActivityQueue().getHeader();
 		if (null != entity) {
 			ActivityInfo nextInfo = new ActivityInfo();
 			
@@ -34,7 +35,9 @@ public class EndJob implements Job {
 			// 调度下一个秒杀活动的开始任务
 			String name = nextInfo.getActivityId() + "_start";
 			String group = nextInfo.getActivityGid() + "_start";
-			SchedulerContext.add(StartJob.class, name, group, new Date());
+			SchedulerContext.getQuartzUtil().add(StartJob.class, name, group, new Date());
+		} else {
+			
 		}
 		
 		/**
