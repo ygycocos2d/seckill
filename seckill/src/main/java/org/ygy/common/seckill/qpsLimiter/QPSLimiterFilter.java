@@ -47,7 +47,7 @@ public class QPSLimiterFilter implements Filter{
          * 增加token定时增加任务到调度器
          * 每intervalInMillis个毫秒执行一次
          */
-        SchedulerContext.scheduleAddTokenNumJob(TokenAdderJob.class, "addTokenJob", "addTokenGroup", intervalInMillis);
+//        SchedulerContext.scheduleAddTokenNumJob(TokenAdderJob.class, "addTokenJob", "addTokenGroup", intervalInMillis);
 	}
 	
 	@Override

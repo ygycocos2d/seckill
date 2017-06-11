@@ -56,14 +56,14 @@ public class ActivityServiceImpl implements ActivityService {
 	}
 
 	@Override
-	public ActivityEntity getByTime(String activityId, Date starttime, Date endtime) {
-		if (null == starttime || null == endtime) {
+	public ActivityEntity getByTime(String activityId, Date startTime, Date endTime) {
+		if (null == startTime || null == endTime) {
 			return null;
 		}
 		Map<String,Object> param = new HashMap<String,Object>();
 		param.put("activityId", activityId);
-		param.put("starttime", starttime);
-		param.put("endtime", endtime);
+		param.put("startTime", startTime);
+		param.put("endTime", endTime);
 		return this.activityDao.getByTime(param);
 	}
 

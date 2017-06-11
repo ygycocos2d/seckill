@@ -6,6 +6,10 @@ public class AtomicIntegerExt extends AtomicInteger {
 
 	private static final long serialVersionUID = 7135811086491281608L;
 	
+	public AtomicIntegerExt(int value){
+		super(value);
+	}
+	
 	/**
 	 * 当值大于0时，减1，返回原值
 	 * @return

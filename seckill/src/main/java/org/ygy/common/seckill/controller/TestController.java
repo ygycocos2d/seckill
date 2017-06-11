@@ -30,12 +30,12 @@ public class TestController {
 		result.put("status", 0);
 		return result;
 	}
-	
-	public Person getPerson(@RequestBody Person p) {
-		return p;
-	}
-	
-	
+//	
+//	public Person getPerson(@RequestBody Person p) {
+//		return p;
+//	}
+//	
+//	
 	
 	
 	
@@ -46,7 +46,7 @@ public class TestController {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	try {
 			Date date = dateFormat.parse("2017-5-16 9:30:10");
-			SchedulerContext.add(MyJob.class, "j1", "g1", date);
+//			SchedulerContext.add(MyJob.class, "j1", "g1", date);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -61,7 +61,7 @@ public class TestController {
 	public Map<String,Object> start() {
 		Map<String,Object> result = new HashMap<String,Object>();
 		
-		SchedulerContext.start();
+//		SchedulerContext.start();
 		
 		result.put("status", 0);
 		return result;

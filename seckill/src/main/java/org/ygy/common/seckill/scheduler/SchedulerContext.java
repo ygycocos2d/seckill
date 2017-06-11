@@ -7,9 +7,11 @@ import java.util.Properties;
 
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
+import org.springframework.util.Assert;
 import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.successlog.ISuccessLog;
 import org.ygy.common.seckill.util.ActivityQueue;
+import org.ygy.common.seckill.util.AtomicIntegerExt;
 import org.ygy.common.seckill.util.FileUtil;
 import org.ygy.common.seckill.util.QuartzUtil;
 
@@ -21,7 +23,7 @@ public class SchedulerContext {
 	private static ActivityInfo curActivityInfo;//
 	/*当前应用各活动要处理的商品秒杀数，Map<活动ID, 商品秒杀数>*/
 	private static Map<String, Integer> curAppHandleGoodsNum = new HashMap<String, Integer>();
-	/**/
+	/*当前秒杀活动用户秒杀成功记录*/
 	private static ISuccessLog sucLog;
 	/*Quartz任务调度器管理工具*/
 	private static QuartzUtil quartzUtil;
@@ -118,20 +120,38 @@ public class SchedulerContext {
 	}
 
 	public static void scheduleChainStart() {
-		if (null != curActivityInfo) {
+		if (null == curActivityInfo) {
 			ActivityEntity entity = activityQueue.getHeader();
-			ActivityInfo curActivity = new ActivityInfo();
-			
-			//这里还得好好写
-//			BeanUtils.copyProperties(entity, curActivity);
-			SchedulerContext.curActivityInfo = curActivity;
-			
-			String name = curActivity.getActivityId() + "_start";
-			String group = curActivity.getActivityGid() + "_start";
-			quartzUtil.add(StartJob.class, name, group, new Date());
+			if (null != entity) {
+				ActivityInfo curActivity = new ActivityInfo();
+				entity2Info(entity, curActivity);
+				SchedulerContext.curActivityInfo = curActivity;
+				String name = curActivity.getActivityId() + "_start";
+				String group = curActivity.getActivityGid() + "_start";
+				quartzUtil.add(StartJob.class, name, group, new Date());
+			}
 		}
 	}
 
+	private static void entity2Info(ActivityEntity entity, ActivityInfo curActivity) {
+		Assert.notNull(entity, "");
+		Assert.notNull(curActivity, "");
+//		if () {
+//			
+//		}
+		curActivity.setActivityId(entity.getActivityId());
+		curActivity.setActivityGid(entity.getGroupId());
+		curActivity.setStartTime(entity.getStartTime().getTime());
+		curActivity.setEndTime(entity.getEndTime().getTime());
+		curActivity.setGoodsId(entity.getGoodsId());
+		AtomicIntegerExt atomicGoodsNumber = new AtomicIntegerExt(entity.getGoodsNumber());
+		curActivity.setGoodsNum(atomicGoodsNumber);
+		curActivity.setGoodsPrice(entity.getGoodsPrice());
+		curActivity.setNumLimit(entity.getLimitNumber());
+		curActivity.setStatus(entity.getStatus());
+		curActivity.setTaskDescribt(entity.getDescribt());
+	}
+	
 	public static ISuccessLog getSucLog() {
 		return sucLog;
 	}

@@ -18,7 +18,7 @@ public class QPSLimiterContext {
 	/**
 	 *  当前令牌数
 	 */
-	private static final AtomicIntegerExt tokenNum = new AtomicIntegerExt();
+	private static final AtomicIntegerExt tokenNum = new AtomicIntegerExt(0);
 
 	/**
 	 * 获取每秒限制的最大请求数

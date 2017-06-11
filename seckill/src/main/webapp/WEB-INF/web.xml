@@ -45,10 +45,10 @@
     <filter-name>timeLimitFilter</filter-name>
     <filter-class>org.ygy.common.seckill.timeLimiter.TimeLimitFilter</filter-class>
   </filter>
-<!--   <filter-mapping>
+  <filter-mapping>
     <filter-name>timeLimitFilter</filter-name>
-    <url-pattern>/test/add</url-pattern>
-  </filter-mapping> -->
+    <url-pattern>/activity/kill</url-pattern>
+  </filter-mapping> 
   
   
   

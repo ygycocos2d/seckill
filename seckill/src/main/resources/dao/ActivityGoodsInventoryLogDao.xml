@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.ygy.common.seckill.dao.ActivityGoodsInventoryLogDao" >
+  <resultMap id="BaseResultMap" type="org.ygy.common.seckill.entity.ActivityGoodsInventoryLogEntity" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="activity_id" property="activityId" jdbcType="VARCHAR" />
+    <result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+    <result column="goods_inventory" property="goodsInventory" jdbcType="INTEGER" />
+    <result column="describt" property="describt" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, activity_id, goods_id, goods_inventory, describt
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from activity_goods_inventory_log
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from activity_goods_inventory_log
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="org.ygy.common.seckill.entity.ActivityGoodsInventoryLogEntity" >
+    insert into activity_goods_inventory_log (id, activity_id, goods_id, 
+      goods_inventory, describt)
+    values (#{id,jdbcType=VARCHAR}, #{activityId,jdbcType=VARCHAR}, #{goodsId,jdbcType=VARCHAR}, 
+      #{goodsInventory,jdbcType=INTEGER}, #{describt,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="org.ygy.common.seckill.entity.ActivityGoodsInventoryLogEntity" >
+    insert into activity_goods_inventory_log
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="activityId != null" >
+        activity_id,
+      </if>
+      <if test="goodsId != null" >
+        goods_id,
+      </if>
+      <if test="goodsInventory != null" >
+        goods_inventory,
+      </if>
+      <if test="describt != null" >
+        describt,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="activityId != null" >
+        #{activityId,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsId != null" >
+        #{goodsId,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsInventory != null" >
+        #{goodsInventory,jdbcType=INTEGER},
+      </if>
+      <if test="describt != null" >
+        #{describt,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.ygy.common.seckill.entity.ActivityGoodsInventoryLogEntity" >
+    update activity_goods_inventory_log
+    <set >
+      <if test="activityId != null" >
+        activity_id = #{activityId,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsId != null" >
+        goods_id = #{goodsId,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsInventory != null" >
+        goods_inventory = #{goodsInventory,jdbcType=INTEGER},
+      </if>
+      <if test="describt != null" >
+        describt = #{describt,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.ygy.common.seckill.entity.ActivityGoodsInventoryLogEntity" >
+    update activity_goods_inventory_log
+    set activity_id = #{activityId,jdbcType=VARCHAR},
+      goods_id = #{goodsId,jdbcType=VARCHAR},
+      goods_inventory = #{goodsInventory,jdbcType=INTEGER},
+      describt = #{describt,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

@@ -24,7 +24,7 @@
     select 
     <include refid="Base_Column_List" />
     from activity
-    where status = '0' and start_time > CURTIME() and end_time > start_time
+    where status = '0' and unix_timestamp(start_time) > unix_timestamp() and end_time > start_time
     order by start_time asc
   </select>
   
@@ -32,7 +32,7 @@
     select 
     <include refid="Base_Column_List" />
     from activity
-    where activity_id = #{activityId,jdbcType=VARCHAR} and start_time > CURTIME()
+    where activity_id = #{activityId,jdbcType=VARCHAR} and unix_timestamp(start_time) > unix_timestamp()
   </select>
   
   <select id="getByTime" resultMap="BaseResultMap" >
@@ -44,9 +44,13 @@
         activity_id != #{activityId,jdbcType=VARCHAR} and 
     </if> 
     (
-    ( #{startTime,jdbcType=TIMESTAMP} >= start_time and end_time >= #{startTime,jdbcType=TIMESTAMP} )
+    	( 
+    	#{startTime,jdbcType=TIMESTAMP} >= start_time and end_time >= #{startTime,jdbcType=TIMESTAMP}
+    	)
     or 
-    ( #{endTime,jdbcType=TIMESTAMP} >= start_time and end_time >= #{endTime,jdbcType=TIMESTAMP} )
+    	( 
+    	#{endTime,jdbcType=TIMESTAMP} >= start_time and end_time >= #{endTime,jdbcType=TIMESTAMP}
+    	)
     )
     limit 1
   </select>

@@ -32,7 +32,7 @@ public class TimeLimitFilter implements Filter {
 //				request.getRequestDispatcher("").forward(request, response);
 //				return;
 //			}
-			request.getRequestDispatcher("friendly/timeLimit").forward(request, response);
+			request.getRequestDispatcher("/friendly/timeLimit").forward(request, response);
 			return;
 		} 
 		chain.doFilter(request, response);

@@ -24,11 +24,11 @@ public interface ActivityService {
 	/**
 	 * 查询starttime或endtime在已有活动中的秒杀活动，只查一个
 	 * @param activityId  当为null时，查全部，非null时，排除自身
-	 * @param starttime
-	 * @param endtime
+	 * @param startTime
+	 * @param endTime
 	 * @return
 	 */
-	ActivityEntity getByTime(String activityId, Date starttime, Date endtime);
+	ActivityEntity getByTime(String activityId, Date startTime, Date endTime);
 
 	void add(ActivityEntity entity);
 

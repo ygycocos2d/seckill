@@ -1,9 +1,12 @@
 package org.ygy.common.seckill.controller;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +22,6 @@ import org.ygy.common.seckill.scheduler.ActivityInfo;
 import org.ygy.common.seckill.scheduler.SchedulerContext;
 import org.ygy.common.seckill.service.ActivityService;
 import org.ygy.common.seckill.service.GoodsService;
-import org.ygy.common.seckill.util.ActivityQueue;
 import org.ygy.common.seckill.util.AtomicIntegerExt;
 import org.ygy.common.seckill.util.Constant;
 import org.ygy.common.seckill.util.StringUtil;
@@ -139,13 +141,23 @@ public class ActivityController {
 		} 
 		try {
 			String[] ids = activityIdList.split(",");
+//			Set<String> set = new HashSet<String>();
+//			for (String id:ids) {
+//				set.
+//			}
+			List<String> idList = Arrays.asList(ids);
+			Set<String> set = new HashSet<String>(idList);
+////			idList.clear();
+////			idList.r
+//			idList.addAll(set);
 			// 获取所有有效的且可修改状态的秒杀活动
-			for (String id:ids) {
+			for (String id:set) {
 				ActivityEntity activity = this.activityService.getEffectiveActivityById(id);
-				if (null != activity) {
+				String oldStatus = activity.getStatus();
+				if (null != activity && !oldStatus.equals(status)) {
 					activity.setStatus(status);
 					//暂停-->启动，减库存
-					if ("1".equals(activity.getStatus()) && "0".equals(status)) {
+					if ("1".equals(oldStatus) && "0".equals(status)) {
 						GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
 						if (activity.getGoodsNumber() <= goods.getGoodsNumber()) {
 							goods.setGoodsNumber(goods.getGoodsNumber()-activity.getGoodsNumber());
@@ -153,15 +165,12 @@ public class ActivityController {
 						}
 					}
 					//启动-->暂停、删除，还库存
-					else if ("0".equals(activity.getStatus()) && !"0".equals(status)) {
+					else if ("0".equals(oldStatus) && !"0".equals(status)) {
 						GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
 						goods.setGoodsNumber(goods.getGoodsNumber()+activity.getGoodsNumber());
 						this.activityService.updateActivityAndGoods(activity,goods);
 					}
-					//暂停-->删除
-					else {
-						this.activityService.update(activity);
-					}
+					this.activityService.update(activity);
 				}
 			}
 			result.put("status", 0);	
@@ -288,8 +297,9 @@ public class ActivityController {
 					GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
 					goods.setGoodsNumber(goods.getGoodsNumber()-activity.getGoodsNumber());
 					this.activityService.addActivityAndUpdateGoods(activity,goods);
+				} else {
+					this.activityService.add(activity);
 				}
-				this.activityService.add(activity);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -328,10 +338,7 @@ public class ActivityController {
 							goods.setGoodsNumber(goods.getGoodsNumber()+activity.getGoodsNumber());
 							this.activityService.updateActivityAndGoods(activity,goods);
 						} 
-						//暂停-->删除
-						else {
-							this.activityService.update(activity);
-						}
+						this.activityService.update(activity);
 					} else {
 						result.put("status", 1);
 						result.put("msg", "该活动已过期或删除");

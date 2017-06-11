@@ -13,7 +13,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.entity.SuccessLogEntity;
-import org.ygy.common.seckill.util.ActivityQueue;
 import org.ygy.common.seckill.util.StringUtil;
 
 public class EndJob implements Job {
