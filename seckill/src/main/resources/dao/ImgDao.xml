@@ -10,6 +10,16 @@
   <sql id="Base_Column_List" >
     img_id, activity_id, img_url, img_type
   </sql>
+  
+  <!--  -->
+  <select id="getImgListByActivityId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from img
+    where activity_id = #{activityId,jdbcType=VARCHAR}
+  </select>
+  
+  <!--工具生成如下  -->
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />

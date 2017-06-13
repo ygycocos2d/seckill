@@ -1,5 +1,7 @@
 package org.ygy.common.seckill.dao;
 
+import java.util.List;
+
 import org.ygy.common.seckill.entity.ImgEntity;
 
 public interface ImgDao {
@@ -14,4 +16,6 @@ public interface ImgDao {
     int updateByPrimaryKeySelective(ImgEntity record);
 
     int updateByPrimaryKey(ImgEntity record);
+
+	List<ImgEntity> getImgListByActivityId(String activityId);
 }

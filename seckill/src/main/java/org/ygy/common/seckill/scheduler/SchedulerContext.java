@@ -133,7 +133,7 @@ public class SchedulerContext {
 		}
 	}
 
-	private static void entity2Info(ActivityEntity entity, ActivityInfo curActivity) {
+	public static void entity2Info(ActivityEntity entity, ActivityInfo curActivity) {
 		Assert.notNull(entity, "");
 		Assert.notNull(curActivity, "");
 //		if () {

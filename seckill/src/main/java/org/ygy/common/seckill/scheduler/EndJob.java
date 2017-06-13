@@ -8,78 +8,85 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.ygy.common.seckill.entity.ActivityEntity;
+import org.ygy.common.seckill.entity.OrderEntity;
 import org.ygy.common.seckill.entity.SuccessLogEntity;
+import org.ygy.common.seckill.service.GoodsService;
 import org.ygy.common.seckill.util.StringUtil;
 
 public class EndJob implements Job {
+	
+	@Resource
+	private GoodsService goodsService;
 
 	@Override
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
+		// 将当前结束的秒杀活动备份，用于活动结束后的相关处理
 		ActivityInfo tempInfo = SchedulerContext.getCurActivityInfo();
-		
-		
+		/*如果有下一个秒杀活动，则进行任务调度*/
 		ActivityEntity entity = SchedulerContext.getActivityQueue().getHeader();
 		if (null != entity) {
 			ActivityInfo nextInfo = new ActivityInfo();
-			
-			//entity-->nextInfo
-			
+			// entity-->nextInfo
+			SchedulerContext.entity2Info(entity,nextInfo);
 			SchedulerContext.setCurActivityInfo(nextInfo);
-			
 			// 调度下一个秒杀活动的开始任务
 			String name = nextInfo.getActivityId() + "_start";
 			String group = nextInfo.getActivityGid() + "_start";
 			SchedulerContext.getQuartzUtil().add(StartJob.class, name, group, new Date());
 		} else {
-			
+			SchedulerContext.setCurActivityInfo(null);
 		}
-		
 		/**
 		 *  进行当前秒杀活动结束后的一些操作（tempInfo），统计实际抢了多少，有多少被多抢了，生成订单、还库存等
 		 */
-		
+		// 该次秒杀活动成功秒杀记录获取后，清除缓存，以备下一个秒杀活动使用
 		Map<String, Integer> killSucLog = SchedulerContext.getSucLog().getAll();
 		SchedulerContext.getSucLog().clearAll();
-		
-		
 		// 构建秒杀成功记录list
 		List<SuccessLogEntity> logEntityList = new ArrayList<SuccessLogEntity>();
-		int invalidSeckillCount = 0;
-		
-		// 生成订单
-//		List<OrderEntity> orderList = new ArrayList<OrderEntity>();
-		
+		List<OrderEntity> orderList = new ArrayList<OrderEntity>();//订单
+		int invalidSeckillTotalCount = 0;//无效商品总数，秒杀活动中即多抢了的商品数
 		Set<Entry<String, Integer>> set = killSucLog.entrySet();
 		Iterator<Entry<String, Integer>> iterator = set.iterator();
 		Date curDate = new Date();
 		while (iterator.hasNext()) {
 			Entry<String, Integer> en = iterator.next();
-			
-			// 统计多抢了超过限制的商品数，用于还库
-			if (tempInfo.getNumLimit() < en.getValue()) {
-				invalidSeckillCount += en.getValue() - tempInfo.getNumLimit();
+			// 统计多抢了超过限制的商品数，用于还库(按道理不允许出现这种情况，出现那就是系统漏洞)
+			int validSeckillCount = en.getValue();//有效秒杀商品数，用于生成订单
+			if (en.getValue() > tempInfo.getNumLimit()) {
+				validSeckillCount = tempInfo.getNumLimit();
+				invalidSeckillTotalCount += en.getValue() - tempInfo.getNumLimit();
 			}
-
 			// 秒杀记录
 			SuccessLogEntity logEntity = new SuccessLogEntity();
 			logEntity.setSucclogId(StringUtil.getUUID());
 			logEntity.setActivityId(tempInfo.getActivityId());
 			logEntity.setUserId(en.getKey());
-			logEntity.setGoodsNumber(en.getValue());
+			logEntity.setGoodsNumber(en.getValue());//如果秒杀数不正常，可以通过记录查看到
 			logEntity.setCreateTime(curDate);
-			
 			logEntityList.add(logEntity);
+			// 生成订单
+			OrderEntity order = new OrderEntity();
+			order.setOrderId(StringUtil.getUUID());
+			order.setGoodsId(tempInfo.getGoodsId());
+			order.setGoodsNumber(validSeckillCount);
+			order.setUserId(en.getKey());
+			order.setStatus("0");//创建状态
+			orderList.add(order);
 		}
+		// 秒杀记录列表存库、订单列表存库
 		
-		// 还库存
-		int toStock = tempInfo.getGoodsNum().intValue() + invalidSeckillCount;
+		// 商品还库存
+		int toStock = tempInfo.getGoodsNum().intValue() + invalidSeckillTotalCount;
 		if (toStock > 0) {
-			// 调用还库存接口
+//			this.goodsService.
 		}
 	}
 

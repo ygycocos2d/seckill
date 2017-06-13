@@ -17,4 +17,5 @@
 	<bean id="activityService" class="org.ygy.common.seckill.serviceImpl.ActivityServiceImpl" />
 	<bean id="goodsService" class="org.ygy.common.seckill.serviceImpl.GoodsServiceImpl" />
 	<bean id="userService" class="org.ygy.common.seckill.serviceImpl.UserServiceImpl" />
+	<bean id="imgService" class="org.ygy.common.seckill.serviceImpl.ImgServiceImpl" />
 </beans>
