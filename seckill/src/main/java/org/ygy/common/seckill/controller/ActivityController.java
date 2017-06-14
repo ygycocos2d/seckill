@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.ygy.common.seckill.dto.ActivityDTO;
 import org.ygy.common.seckill.entity.ActivityEntity;
+import org.ygy.common.seckill.entity.ActivityGoodsInventoryLogEntity;
 import org.ygy.common.seckill.entity.GoodsEntity;
 import org.ygy.common.seckill.scheduler.ActivityInfo;
 import org.ygy.common.seckill.scheduler.SchedulerContext;
@@ -141,15 +142,8 @@ public class ActivityController {
 		} 
 		try {
 			String[] ids = activityIdList.split(",");
-//			Set<String> set = new HashSet<String>();
-//			for (String id:ids) {
-//				set.
-//			}
 			List<String> idList = Arrays.asList(ids);
 			Set<String> set = new HashSet<String>(idList);
-////			idList.clear();
-////			idList.r
-//			idList.addAll(set);
 			// 获取所有有效的且可修改状态的秒杀活动
 			for (String id:set) {
 				ActivityEntity activity = this.activityService.getEffectiveActivityById(id);
@@ -161,14 +155,30 @@ public class ActivityController {
 						GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
 						if (activity.getGoodsNumber() <= goods.getGoodsNumber()) {
 							goods.setGoodsNumber(goods.getGoodsNumber()-activity.getGoodsNumber());
-							this.activityService.updateActivityAndGoods(activity,goods);
+							ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
+							inventoryLog.setId(StringUtil.getUUID());
+							inventoryLog.setActivityId(activity.getActivityId());
+							inventoryLog.setGoodsId(goods.getGoodsId());
+							inventoryLog.setGoodsInventory(-(activity.getGoodsNumber()));
+							inventoryLog.setDescribt("商品-->活动");
+							this.activityService.updateActivityAndGoods(activity,goods,inventoryLog);
+						} else {
+							result.put("status", 1);
+							result.put("msg", "商品'"+goods.getGoodsName()+"'库存不足");
+							return result;
 						}
 					}
 					//启动-->暂停、删除，还库存
 					else if ("0".equals(oldStatus) && !"0".equals(status)) {
 						GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
 						goods.setGoodsNumber(goods.getGoodsNumber()+activity.getGoodsNumber());
-						this.activityService.updateActivityAndGoods(activity,goods);
+						ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
+						inventoryLog.setId(StringUtil.getUUID());
+						inventoryLog.setActivityId(activity.getActivityId());
+						inventoryLog.setGoodsId(goods.getGoodsId());
+						inventoryLog.setGoodsInventory(activity.getGoodsNumber());
+						inventoryLog.setDescribt("活动-->商品");
+						this.activityService.updateActivityAndGoods(activity,goods,inventoryLog);
 					}
 					this.activityService.update(activity);
 				}
@@ -296,7 +306,13 @@ public class ActivityController {
 				if (Constant.ACTIVITY_STATUS_START.equals(dto.getStatus())) {
 					GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
 					goods.setGoodsNumber(goods.getGoodsNumber()-activity.getGoodsNumber());
-					this.activityService.addActivityAndUpdateGoods(activity,goods);
+					ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
+					inventoryLog.setId(StringUtil.getUUID());
+					inventoryLog.setActivityId(activity.getActivityId());
+					inventoryLog.setGoodsId(goods.getGoodsId());
+					inventoryLog.setGoodsInventory(-(activity.getGoodsNumber()));
+					inventoryLog.setDescribt("商品-->活动");
+					this.activityService.addActivityAndUpdateGoods(activity,goods,inventoryLog);
 				} else {
 					this.activityService.add(activity);
 				}
@@ -330,13 +346,25 @@ public class ActivityController {
 						if ("1".equals(en.getStatus()) && "0".equals(activity.getStatus())) {
 							GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
 							goods.setGoodsNumber(goods.getGoodsNumber()-activity.getGoodsNumber());
-							this.activityService.updateActivityAndGoods(activity,goods);
+							ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
+							inventoryLog.setId(StringUtil.getUUID());
+							inventoryLog.setActivityId(activity.getActivityId());
+							inventoryLog.setGoodsId(goods.getGoodsId());
+							inventoryLog.setGoodsInventory(-(activity.getGoodsNumber()));
+							inventoryLog.setDescribt("商品-->活动");
+							this.activityService.updateActivityAndGoods(activity,goods,inventoryLog);
 						} 
 						//启动-->暂停、删除，还库存
 						else if ("0".equals(en.getStatus()) && !"0".equals(activity.getStatus())) {
 							GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
 							goods.setGoodsNumber(goods.getGoodsNumber()+activity.getGoodsNumber());
-							this.activityService.updateActivityAndGoods(activity,goods);
+							ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
+							inventoryLog.setId(StringUtil.getUUID());
+							inventoryLog.setActivityId(activity.getActivityId());
+							inventoryLog.setGoodsId(goods.getGoodsId());
+							inventoryLog.setGoodsInventory(activity.getGoodsNumber());
+							inventoryLog.setDescribt("活动-->商品");
+							this.activityService.updateActivityAndGoods(activity,goods,inventoryLog);
 						} 
 						this.activityService.update(activity);
 					} else {

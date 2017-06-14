@@ -1,5 +1,7 @@
 package org.ygy.common.seckill.entity;
 
+import java.util.Date;
+
 public class ActivityGoodsInventoryLogEntity {
     private String id;
 
@@ -8,6 +10,8 @@ public class ActivityGoodsInventoryLogEntity {
     private String goodsId;
 
     private Integer goodsInventory;
+
+    private Date createTime;
 
     private String describt;
 
@@ -41,6 +45,14 @@ public class ActivityGoodsInventoryLogEntity {
 
     public void setGoodsInventory(Integer goodsInventory) {
         this.goodsInventory = goodsInventory;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     public String getDescribt() {

@@ -13,6 +13,11 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 
+/**
+ * 动态操作Quartz任务调度的工具类
+ * @author ygy
+ *
+ */
 public class QuartzUtil {
 	
 	private Scheduler scheduler;

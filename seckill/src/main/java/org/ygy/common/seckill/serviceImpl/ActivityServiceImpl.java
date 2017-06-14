@@ -9,8 +9,10 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.ygy.common.seckill.dao.ActivityDao;
+import org.ygy.common.seckill.dao.ActivityGoodsInventoryLogDao;
 import org.ygy.common.seckill.dao.GoodsDao;
 import org.ygy.common.seckill.entity.ActivityEntity;
+import org.ygy.common.seckill.entity.ActivityGoodsInventoryLogEntity;
 import org.ygy.common.seckill.entity.GoodsEntity;
 import org.ygy.common.seckill.service.ActivityService;
 import org.ygy.common.seckill.util.StringUtil;
@@ -22,6 +24,9 @@ public class ActivityServiceImpl implements ActivityService {
 	
 	@Resource
 	private GoodsDao goodsDao;
+	
+	@Resource
+	private ActivityGoodsInventoryLogDao nventoryLogDao;
 	
 	@Override
 	public ActivityEntity getEffectiveActivityById(String id) {
@@ -83,19 +88,21 @@ public class ActivityServiceImpl implements ActivityService {
 
 	//记得加事务
 	@Override
-	public void updateActivityAndGoods(ActivityEntity activity, GoodsEntity goods) {
-		if (null != activity && null != goods) {
+	public void updateActivityAndGoods(ActivityEntity activity, GoodsEntity goods,ActivityGoodsInventoryLogEntity inventoryLog) {
+		if (null != activity && null != goods && null != inventoryLog) {
 			this.activityDao.updateByPrimaryKeySelective(activity);
 			this.goodsDao.updateByPrimaryKeySelective(goods);
+			this.nventoryLogDao.insertSelective(inventoryLog);
 		}
 	}
 
 	//记得加事务
 	@Override
-	public void addActivityAndUpdateGoods(ActivityEntity activity, GoodsEntity goods) {
-		if (null != activity && null != goods) {
+	public void addActivityAndUpdateGoods(ActivityEntity activity, GoodsEntity goods,ActivityGoodsInventoryLogEntity inventoryLog) {
+		if (null != activity && null != goods && null != inventoryLog) {
 			this.activityDao.insertSelective(activity);
 			this.goodsDao.updateByPrimaryKeySelective(goods);
+			this.nventoryLogDao.insertSelective(inventoryLog);
 		}
 	}
 
