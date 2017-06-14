@@ -14,15 +14,29 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.ygy.common.seckill.entity.ActivityEntity;
+import org.ygy.common.seckill.entity.ActivityGoodsInventoryLogEntity;
+import org.ygy.common.seckill.entity.GoodsEntity;
 import org.ygy.common.seckill.entity.OrderEntity;
 import org.ygy.common.seckill.entity.SuccessLogEntity;
+import org.ygy.common.seckill.service.ActivityGoodsInventoryLogService;
 import org.ygy.common.seckill.service.GoodsService;
+import org.ygy.common.seckill.service.OrderService;
+import org.ygy.common.seckill.service.SuccessLogService;
 import org.ygy.common.seckill.util.StringUtil;
 
 public class EndJob implements Job {
 	
 	@Resource
 	private GoodsService goodsService;
+	
+	@Resource
+	private SuccessLogService successLogService;
+	
+	@Resource
+	private OrderService orderService;
+	
+	@Resource
+	private ActivityGoodsInventoryLogService inventoryLogService;
 
 	@Override
 	public void execute(JobExecutionContext context)
@@ -46,7 +60,7 @@ public class EndJob implements Job {
 		/**
 		 *  进行当前秒杀活动结束后的一些操作（tempInfo），统计实际抢了多少，有多少被多抢了，生成订单、还库存等
 		 */
-		// 该次秒杀活动成功秒杀记录获取后，清除缓存，以备下一个秒杀活动使用
+		// 该次秒杀活动秒杀记录获取后，清除缓存，以备下一个秒杀活动使用
 		Map<String, Integer> killSucLog = SchedulerContext.getSucLog().getAll();
 		SchedulerContext.getSucLog().clearAll();
 		// 构建秒杀成功记录list
@@ -82,11 +96,21 @@ public class EndJob implements Job {
 			orderList.add(order);
 		}
 		// 秒杀记录列表存库、订单列表存库
-		
+		this.successLogService.batchAddSuccessLog(logEntityList);
+		this.orderService.batchAddOrder(orderList);
 		// 商品还库存
 		int toStock = tempInfo.getGoodsNum().intValue() + invalidSeckillTotalCount;
 		if (toStock > 0) {
-//			this.goodsService.
+			GoodsEntity goods = this.goodsService.getGoodsById(tempInfo.getGoodsId());
+			goods.setGoodsNumber(goods.getGoodsNumber() + toStock);
+			this.goodsService.update(goods);
+			ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
+			inventoryLog.setId(StringUtil.getUUID());
+			inventoryLog.setActivityId(tempInfo.getActivityId());
+			inventoryLog.setGoodsId(goods.getGoodsId());
+			inventoryLog.setGoodsInventory(toStock);
+			inventoryLog.setDescribt("活动-->商品，活动结束还库存，活动剩余="+tempInfo.getGoodsNum().intValue()+",用户多抢="+invalidSeckillTotalCount);
+			this.inventoryLogService.add(inventoryLog);
 		}
 	}
 

@@ -20,4 +20,11 @@ public class GoodsServiceImpl implements GoodsService{
 		return this.goodsDao.selectByPrimaryKey(goodsId);
 	}
 
+	@Override
+	public void update(GoodsEntity goods) {
+		if (null != goods) {
+			this.goodsDao.updateByPrimaryKeySelective(goods);
+		}
+	}
+
 }

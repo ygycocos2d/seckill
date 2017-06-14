@@ -6,4 +6,6 @@ public interface GoodsService {
 
 	GoodsEntity getGoodsById(String goodsId);
 
+	void update(GoodsEntity goods);
+
 }
