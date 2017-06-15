@@ -1,7 +1,14 @@
 package org.ygy.common.seckill.entity;
 
-public class UserEntity {
-    private String userId;
+import java.io.Serializable;
+
+public class UserEntity implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7572809110241194602L;
+
+	private String userId;
 
     private String userAccount;
 
