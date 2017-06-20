@@ -43,20 +43,14 @@ public class EndJob implements Job {
 			throws JobExecutionException {
 		// 将当前结束的秒杀活动备份，用于活动结束后的相关处理
 		ActivityInfo tempInfo = SchedulerContext.getCurActivityInfo();
-		/*如果有下一个秒杀活动，则进行任务调度*/
-		ActivityEntity entity = SchedulerContext.getActivityQueue().getHeader();
+		SchedulerContext.setCurActivityInfo(null);
+		// 如果有下一个秒杀活动，则进行任务调度
+		ActivityEntity entity = SchedulerContext.getActivityQueue().getHeaderNotDel();
 		if (null != entity) {
-			ActivityInfo nextInfo = new ActivityInfo();
-			// entity-->nextInfo
-			SchedulerContext.entity2Info(entity,nextInfo);
-			SchedulerContext.setCurActivityInfo(nextInfo);
-			// 调度下一个秒杀活动的开始任务
-			String name = nextInfo.getActivityId() + "_start";
-			String group = nextInfo.getActivityGid() + "_start";
+			String name = entity.getActivityId() + "_start";
+			String group = entity.getGroupId() + "_start";
 			SchedulerContext.getQuartzUtil().add(StartJob.class, name, group, new Date());
-		} else {
-			SchedulerContext.setCurActivityInfo(null);
-		}
+		} 
 		/**
 		 *  进行当前秒杀活动结束后的一些操作（tempInfo），统计实际抢了多少，有多少被多抢了，生成订单、还库存等
 		 */

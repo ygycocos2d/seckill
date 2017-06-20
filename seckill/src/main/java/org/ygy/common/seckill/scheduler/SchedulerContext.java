@@ -7,11 +7,9 @@ import java.util.Properties;
 
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
-import org.springframework.util.Assert;
 import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.successlog.ISuccessLog;
 import org.ygy.common.seckill.util.ActivityQueue;
-import org.ygy.common.seckill.util.AtomicIntegerExt;
 import org.ygy.common.seckill.util.FileUtil;
 import org.ygy.common.seckill.util.QuartzUtil;
 
@@ -67,42 +65,6 @@ public class SchedulerContext {
 		return curAppHandleGoodsNum.get(activityId);
 	}
 
-	public static void main(String[] args) {  
-//	    try {  
-//	    	add(MyJob.class, "job1", "group1", 
-//	    			new Date(System.currentTimeMillis()-10*1000));
-//	    	System.out.println(new Date(System.currentTimeMillis()));
-//	    	Thread.sleep(5*1000);
-//	    	
-////	    	pause("job1", "group1");
-//	    	
-//	    	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//	    	Date date = dateFormat.parse("2017-5-16 9:30:10");
-//	    	System.out.println(update("job1", "group1",date));
-//	    	scheduler.pauseAll();
-	    	
-	    	
-//	    	SimpleTriggerImpl trigger=new SimpleTriggerImpl("trigger1","group1");
-//	    	trigger.setStartTime(new Date());
-//	    	trigger.setRepeatInterval(1);
-//	    	trigger.setRepeatCount(-1);
-	    	
-//	    	JobDetail jobDetail = JobBuilder.newJob(MyJob.class).withIdentity("111", "1123").build();
-//	    	
-//	    	Trigger trigger = TriggerBuilder.newTrigger()
-//	    			.withIdentity("sfds", "dsfds").withSchedule(SimpleScheduleBuilder.simpleSchedule()
-//	    					.withIntervalInMilliseconds(1)
-////	    	    	        .withIntervalInSeconds(1) 
-//	    	    	        .repeatForever()).startAt(new Date()).build();  
-//	    	
-//	    	scheduler.scheduleJob(jobDetail, trigger);
-//	        start();  
-//
-//	    } catch(Exception e){  
-//	    	e.printStackTrace();  
-//	    }  
-	}
-
 	public static ActivityInfo getCurActivityInfo() {
 		return curActivityInfo;
 	}
@@ -121,37 +83,15 @@ public class SchedulerContext {
 
 	public static void scheduleChainStart() {
 		if (null == curActivityInfo) {
-			ActivityEntity entity = activityQueue.getHeader();
-			if (null != entity) {
-				ActivityInfo curActivity = new ActivityInfo();
-				entity2Info(entity, curActivity);
-				SchedulerContext.curActivityInfo = curActivity;
-				String name = curActivity.getActivityId() + "_start";
-				String group = curActivity.getActivityGid() + "_start";
+			if (!activityQueue.isEmpty()) {
+				ActivityEntity entity = activityQueue.getHeaderNotDel();
+				String name = entity.getActivityId() + "_start";
+				String group = entity.getGroupId() + "_start";
 				quartzUtil.add(StartJob.class, name, group, new Date());
 			}
 		}
 	}
 
-	public static void entity2Info(ActivityEntity entity, ActivityInfo curActivity) {
-		Assert.notNull(entity, "");
-		Assert.notNull(curActivity, "");
-//		if () {
-//			
-//		}
-		curActivity.setActivityId(entity.getActivityId());
-		curActivity.setActivityGid(entity.getGroupId());
-		curActivity.setStartTime(entity.getStartTime().getTime());
-		curActivity.setEndTime(entity.getEndTime().getTime());
-		curActivity.setGoodsId(entity.getGoodsId());
-		AtomicIntegerExt atomicGoodsNumber = new AtomicIntegerExt(entity.getGoodsNumber());
-		curActivity.setGoodsNum(atomicGoodsNumber);
-		curActivity.setGoodsPrice(entity.getGoodsPrice());
-		curActivity.setNumLimit(entity.getLimitNumber());
-		curActivity.setStatus(entity.getStatus());
-		curActivity.setTaskDescribt(entity.getDescribt());
-	}
-	
 	public static ISuccessLog getSucLog() {
 		return sucLog;
 	}

@@ -18,7 +18,15 @@ public class ActivityQueue {
 				}
 	});
 	
-	public ActivityEntity getHeader() {
+	public ActivityEntity getHeaderNotDel() {
+		return activityQueue.peek();
+	}
+	
+	public boolean isEmpty() {
+		return activityQueue.isEmpty();
+	}
+	
+	public ActivityEntity getHeaderAndDel() {
 		return activityQueue.poll();
 	}
 	
@@ -67,6 +75,8 @@ public class ActivityQueue {
 	 public static void main(String[] args) {
 
 //		 ActivityEntity e1 = new ActivityEntity();
+		 ActivityQueue a = new ActivityQueue();
+		 System.out.println(a.isEmpty());
 //		 e1.setStartTime(new Date(System.currentTimeMillis() + 10000));
 //		 activityQueue.add(e1);
 //		 ActivityEntity e2 = new ActivityEntity();
