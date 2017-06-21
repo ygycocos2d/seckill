@@ -34,15 +34,20 @@ public class EndJob implements Job {
 	private ActivityGoodsInventoryLogService inventoryLogService;
 	
 	public EndJob() {
-		goodsService = (GoodsService) SpringContextUtil.getBeanByClass(GoodsService.class);
-		successLogService = (SuccessLogService) SpringContextUtil.getBeanByClass(SuccessLogService.class);
-		orderService = (OrderService) SpringContextUtil.getBeanByClass(OrderService.class);
-		inventoryLogService = (ActivityGoodsInventoryLogService) SpringContextUtil.getBeanByClass(ActivityGoodsInventoryLogService.class);
+		try {
+			goodsService = (GoodsService) SpringContextUtil.getBeanByClass(GoodsService.class);
+			successLogService = (SuccessLogService) SpringContextUtil.getBeanByClass(SuccessLogService.class);
+			orderService = (OrderService) SpringContextUtil.getBeanByClass(OrderService.class);
+			inventoryLogService = (ActivityGoodsInventoryLogService) SpringContextUtil.getBeanByClass(ActivityGoodsInventoryLogService.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
+		System.out.println("endjob start---------------------");
 		// 将当前结束的秒杀活动备份，用于活动结束后的相关处理
 		ActivityInfo tempInfo = SchedulerContext.getCurActivityInfo();
 		SchedulerContext.setCurActivityInfo(null);

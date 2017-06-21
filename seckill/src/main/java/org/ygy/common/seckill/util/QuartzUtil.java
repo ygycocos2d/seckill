@@ -42,20 +42,20 @@ public class QuartzUtil {
 	 * @param jobClass
 	 * @param name
 	 * @param group
-	 * @param date  执行时间不能为过去时间
+	 * @param date  
 	 * @return
 	 */
 	public boolean add(Class<? extends Job> jobClass, String name, String group, Date date) {
+		System.out.println(name+"---start");
         try {
-        	if (date.getTime() >= System.currentTimeMillis()) {
-        		JobDetail job = JobBuilder.newJob(jobClass).withIdentity(name, group).build();  
-        		Trigger trigger = TriggerBuilder.newTrigger().withIdentity(name, group).startAt(date).build();      
-            	//把作业和触发器注册到任务调度中  
-    			Date resDate = scheduler.scheduleJob(job, trigger);
-    			if (null != resDate) {
-    				return true;
-    			}
-        	}
+        	JobDetail job = JobBuilder.newJob(jobClass).withIdentity(name, group).build();  
+        	Trigger trigger = TriggerBuilder.newTrigger().withIdentity(name, group).startAt(date).build();      
+            //把作业和触发器注册到任务调度中  
+    		Date resDate = scheduler.scheduleJob(job, trigger);
+    		if (null != resDate) {
+    			System.out.println(name+"---end");
+    			return true;
+    		}
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}

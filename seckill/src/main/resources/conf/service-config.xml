@@ -18,6 +18,9 @@
 	<bean id="goodsService" class="org.ygy.common.seckill.serviceImpl.GoodsServiceImpl" />
 	<bean id="userService" class="org.ygy.common.seckill.serviceImpl.UserServiceImpl" />
 	<bean id="imgService" class="org.ygy.common.seckill.serviceImpl.ImgServiceImpl" />
+	<bean id="inventoryLogService" class="org.ygy.common.seckill.serviceImpl.ActivityGoodsInventoryLogServiceImpl" />
+	<bean id="orderService" class="org.ygy.common.seckill.serviceImpl.OrderServiceImpl" />
+	<bean id="successLogService" class="org.ygy.common.seckill.serviceImpl.SuccessLogServiceImpl" />
 	
 	<bean id="springContextUtil" class="org.ygy.common.seckill.util.SpringContextUtil" />
 </beans>

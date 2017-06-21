@@ -30,5 +30,14 @@ public class FriendlyController {
 		result.put("msg", "人太多了");
 		return result;
 	}
+	
+	@RequestMapping("noLogin")
+	@ResponseBody
+	public Map<String,Object> noLogin(HttpServletRequest request) {
+		Map<String,Object> result = new HashMap<String,Object>();
+		result.put("status", 7);
+		result.put("msg", "请先登录");
+		return result;
+	}
 
 }

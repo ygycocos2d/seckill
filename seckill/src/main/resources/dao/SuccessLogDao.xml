@@ -11,6 +11,18 @@
   <sql id="Base_Column_List" >
     succlog_id, user_id, activity_id, goods_number, create_time
   </sql>
+  
+  <insert id="batchAddSuccessLog" parameterType="java.util.List" >
+    insert into 
+    success_log (succlog_id, user_id, activity_id, goods_number, create_time)
+    values 
+    <foreach collection="list" item="item" index="index" separator="," >   
+        (#{item.succlogId,jdbcType=VARCHAR}, #{item.userId,jdbcType=VARCHAR}, #{item.activityId,jdbcType=VARCHAR}, 
+      #{item.goodsNumber,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP})
+    </foreach>
+  </insert>
+  
+  <!--工具生成  -->
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />

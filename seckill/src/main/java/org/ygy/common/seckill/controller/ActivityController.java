@@ -19,6 +19,7 @@ import org.ygy.common.seckill.dto.ActivityDTO;
 import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.entity.ActivityGoodsInventoryLogEntity;
 import org.ygy.common.seckill.entity.GoodsEntity;
+import org.ygy.common.seckill.entity.UserEntity;
 import org.ygy.common.seckill.scheduler.ActivityInfo;
 import org.ygy.common.seckill.scheduler.SchedulerContext;
 import org.ygy.common.seckill.service.ActivityService;
@@ -64,7 +65,8 @@ public class ActivityController {
 		Map<String,Object> result = new HashMap<String,Object>();
 		result.put("status", 0);
 		try {
-			String userId = (String) request.getSession(true).getAttribute("userId");
+			UserEntity user = (UserEntity) request.getSession(true).getAttribute("user");
+			String userId = user.getUserId();
 			int num = SchedulerContext.getSucLog().get(userId);
 			ActivityInfo currentTask = SchedulerContext.getCurActivityInfo();
 			// 是否达秒杀上限
@@ -253,8 +255,11 @@ public class ActivityController {
 	public Map<String,Object> startMasterSwitch() {
 		Map<String,Object> result = new HashMap<String,Object>();
 		if (SchedulerContext.getMasterSwitch()) {
+			result.put("status", 1);
 			result.put("msg", "调度总开关已开启");
-		} else {
+			return result;
+		}
+		try {
 			// 状态为已启动且秒杀活动开始时间没过期
 			List<ActivityEntity> activityList = this.activityService.getAllEffectiveActivity();
 			if (null != activityList && !activityList.isEmpty()) {
@@ -264,9 +269,15 @@ public class ActivityController {
 				SchedulerContext.scheduleChainStart();
 				// 记录下总开关状态
 				SchedulerContext.setMasterSwitch(true);
+				result.put("status", 0);
 			} else {
+				result.put("status", 2);
 				result.put("msg", "没有任何有效的秒杀活动");
 			}
+		} catch (Exception e) {
+			result.put("status", -1);
+			result.put("msg", "系统异常");
+			e.printStackTrace();
 		}
 		return result;
 	}
@@ -280,14 +291,22 @@ public class ActivityController {
 	public Map<String,Object> stopMasterSwitch() {
 		Map<String,Object> result = new HashMap<String,Object>();
 		if (!SchedulerContext.getMasterSwitch()) {
+			result.put("status", 1);
 			result.put("msg", "调度总开关已关闭");
-		} else {
+			return result;
+		} 
+		try {
 			// 清空秒杀活动优先级队列
 			SchedulerContext.getActivityQueue().removeAll();
 			// 清空调度器中还没执行的活动的任务
 			this.clearNoExecutedJobFromScheduler();
 			// 记录下总开关状态
 			SchedulerContext.setMasterSwitch(false);
+			result.put("status", 0);
+		} catch (Exception e) {
+			result.put("status", -1);
+			result.put("msg", "系统异常");
+			e.printStackTrace();
 		}
 		return result;
 	}

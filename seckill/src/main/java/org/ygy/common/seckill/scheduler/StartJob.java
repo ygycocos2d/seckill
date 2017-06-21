@@ -18,7 +18,11 @@ public class StartJob implements Job {
 	private ImgService imgService;
 	
 	public StartJob() {
-		imgService = (ImgService) SpringContextUtil.getBeanByClass(ImgService.class);
+		try {
+			imgService = (ImgService) SpringContextUtil.getBeanByClass(ImgService.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

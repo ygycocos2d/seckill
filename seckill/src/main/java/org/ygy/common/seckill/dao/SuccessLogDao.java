@@ -1,5 +1,7 @@
 package org.ygy.common.seckill.dao;
 
+import java.util.List;
+
 import org.ygy.common.seckill.entity.SuccessLogEntity;
 
 public interface SuccessLogDao {
@@ -14,4 +16,6 @@ public interface SuccessLogDao {
     int updateByPrimaryKeySelective(SuccessLogEntity record);
 
     int updateByPrimaryKey(SuccessLogEntity record);
+
+	int batchAddSuccessLog(List<SuccessLogEntity> logEntityList);
 }

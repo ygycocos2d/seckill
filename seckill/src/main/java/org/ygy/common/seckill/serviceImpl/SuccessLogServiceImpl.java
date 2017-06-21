@@ -13,12 +13,15 @@ public class SuccessLogServiceImpl implements SuccessLogService{
 	@Resource
 	private SuccessLogDao successLogDao;
 	
+	
+	/**
+	 * 考虑数据量大时，分批次插入，且启用事务
+	 */
 	@Override
 	public void batchAddSuccessLog(List<SuccessLogEntity> logEntityList) {
 		if (null != logEntityList && logEntityList.size() > 0) {
-			
+			this.successLogDao.batchAddSuccessLog(logEntityList);
 		}
-		
 	}
 
 }

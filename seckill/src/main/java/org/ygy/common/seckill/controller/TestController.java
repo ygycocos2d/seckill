@@ -9,12 +9,12 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.junit.Test;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.ygy.common.seckill.scheduler.SchedulerContext;
-import org.ygy.common.seckill.util.MyJob;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -65,5 +65,18 @@ public class TestController {
 		
 		result.put("status", 0);
 		return result;
+	}
+	
+	@Test
+	public void testA() {
+//		Date date = new Date();
+//		SchedulerContext.getQuartzUtil().add(Job1.class, "name1", "group1", date);
+//		
+//		try {
+//			Thread.sleep(1000*60);
+//		} catch (Exception e) {
+//			// TODO: handle exception
+//		}
+//		System.out.println("---main end-----------");
 	}
 }
