@@ -3,8 +3,6 @@ package org.ygy.common.seckill.scheduler;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;

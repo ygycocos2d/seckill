@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -22,21 +20,25 @@ import org.ygy.common.seckill.service.ActivityGoodsInventoryLogService;
 import org.ygy.common.seckill.service.GoodsService;
 import org.ygy.common.seckill.service.OrderService;
 import org.ygy.common.seckill.service.SuccessLogService;
+import org.ygy.common.seckill.util.SpringContextUtil;
 import org.ygy.common.seckill.util.StringUtil;
 
 public class EndJob implements Job {
 	
-	@Resource
 	private GoodsService goodsService;
 	
-	@Resource
 	private SuccessLogService successLogService;
 	
-	@Resource
 	private OrderService orderService;
 	
-	@Resource
 	private ActivityGoodsInventoryLogService inventoryLogService;
+	
+	public EndJob() {
+		goodsService = (GoodsService) SpringContextUtil.getBeanByClass(GoodsService.class);
+		successLogService = (SuccessLogService) SpringContextUtil.getBeanByClass(SuccessLogService.class);
+		orderService = (OrderService) SpringContextUtil.getBeanByClass(OrderService.class);
+		inventoryLogService = (ActivityGoodsInventoryLogService) SpringContextUtil.getBeanByClass(ActivityGoodsInventoryLogService.class);
+	}
 
 	@Override
 	public void execute(JobExecutionContext context)
