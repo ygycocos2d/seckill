@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50540
 File Encoding         : 65001
 
-Date: 2017-06-04 22:14:02
+Date: 2017-06-25 22:42:11
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -27,18 +27,63 @@ CREATE TABLE `activity` (
   `goods_id` varchar(32) NOT NULL COMMENT '秒杀商品ID',
   `goods_price` int(11) NOT NULL COMMENT '秒杀商品的秒伤价,以分为单位',
   `goods_number` int(11) NOT NULL COMMENT '秒杀商品数量',
-  `left_goods_number` int(11) DEFAULT NULL COMMENT '整个秒杀活动没分配到应用处理的库存',
   `limit_number` int(11) NOT NULL DEFAULT '1' COMMENT '每个用户至多秒杀的限制数量',
-  `pay_delay` int(11) NOT NULL COMMENT '秒杀成功不支付失效时间，时间为秒',
+  `pay_delay` int(11) DEFAULT '1800' COMMENT '秒杀成功不支付过期时间，单位为秒；当为0-永不过期；默认30分钟，即1800秒',
   `status` char(1) NOT NULL COMMENT '秒杀任务状态，0-启动，1-暂停，2-删除',
   `describt` varchar(1024) DEFAULT NULL COMMENT '秒杀描述',
   PRIMARY KEY (`activity_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='秒杀任务信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='秒杀任务信息表';
 
 -- ----------------------------
 -- Records of activity
 -- ----------------------------
-INSERT INTO `activity` VALUES ('e2c9b3ca88ca48948d2d65c126972c47', 'd215349fa060425c8198bbc40f65d597', '2017-06-03 08:00:00', '2017-06-04 08:00:00', '123456789101213141516171819203', '10', '10', null, '1', '6000', '0', '天下武功唯快不破');
+INSERT INTO `activity` VALUES ('a0397652140c40deacba69cbeabfe973', '52f0fbbc14ab4e45a4fe58b8854ce11a', '2017-06-21 21:54:40', '2017-06-21 21:55:10', '123456789101213141516171819203', '10', '10', '1', '6000', '0', '天下武功唯快不破');
+INSERT INTO `activity` VALUES ('e2c9b3ca88ca48948d2d65c126972c47', 'd215349fa060425c8198bbc40f65d597', '2017-06-24 12:59:00', '2017-06-24 11:07:30', '123456789101213141516171819203', '10', '10', '1', '6000', '1', '天下武功唯快不破');
+
+-- ----------------------------
+-- Table structure for `activity_goods_inventory_log`
+-- ----------------------------
+DROP TABLE IF EXISTS `activity_goods_inventory_log`;
+CREATE TABLE `activity_goods_inventory_log` (
+  `id` varchar(32) NOT NULL COMMENT '主键ID',
+  `activity_id` varchar(32) NOT NULL COMMENT '秒杀活动id',
+  `goods_id` varchar(32) NOT NULL COMMENT '商品id',
+  `goods_inventory` int(11) NOT NULL COMMENT '负数：秒杀活动从商品中减库存，正数：秒杀活动给商品还库存',
+  `describt` varchar(256) DEFAULT NULL COMMENT '商品库存去向简单说明',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='活动减还库存记录表';
+
+-- ----------------------------
+-- Records of activity_goods_inventory_log
+-- ----------------------------
+INSERT INTO `activity_goods_inventory_log` VALUES ('0f629f0d09324272af14b60a5474d174', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '9', '活动-->商品，活动结束还库存，活动剩余=9,用户多抢=0', '0000-00-00 00:00:00');
+INSERT INTO `activity_goods_inventory_log` VALUES ('1f192e15a9824a90966148ada48d9a68', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '9', '活动-->商品，活动结束还库存，活动剩余=9,用户多抢=0', '0000-00-00 00:00:00');
+INSERT INTO `activity_goods_inventory_log` VALUES ('201946ebc93d40bf95a70b390c34bb7b', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '8', '活动-->商品，活动结束还库存，活动剩余=8,用户多抢=0', '0000-00-00 00:00:00');
+INSERT INTO `activity_goods_inventory_log` VALUES ('23ee6892f1504b5681662cd191d9bd5d', 'a0397652140c40deacba69cbeabfe973', '123456789101213141516171819203', '10', '活动-->商品，活动结束还库存，活动剩余=10,用户多抢=0', '0000-00-00 00:00:00');
+INSERT INTO `activity_goods_inventory_log` VALUES ('394fc71c0d1142479125d1b4777aec1b', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '10', '活动-->商品，活动结束还库存，活动剩余=10,用户多抢=0', '0000-00-00 00:00:00');
+INSERT INTO `activity_goods_inventory_log` VALUES ('6c3b83f7b07a433e9d86c5fa2daafdf3', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '9', '活动-->商品，活动结束还库存，活动剩余=9,用户多抢=0', '0000-00-00 00:00:00');
+INSERT INTO `activity_goods_inventory_log` VALUES ('816b1bebd22f411895d9a87220e64fbc', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '-10', '商品-->活动', null);
+INSERT INTO `activity_goods_inventory_log` VALUES ('8a0cd9e2adab4e7bb3ce255d51bde0d7', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '10', '活动-->商品', '0000-00-00 00:00:00');
+INSERT INTO `activity_goods_inventory_log` VALUES ('adb8f4abd8fc4beba2a6c0a1ea8db70e', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '9', '活动-->商品，活动结束还库存，活动剩余=9,用户多抢=0', '0000-00-00 00:00:00');
+INSERT INTO `activity_goods_inventory_log` VALUES ('c3c6dfa9d9cd472d9af47fab9afd2e52', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '9', '活动-->商品，活动结束还库存，活动剩余=9,用户多抢=0', '0000-00-00 00:00:00');
+INSERT INTO `activity_goods_inventory_log` VALUES ('c5839ca441ec41bba5706cace0eef46d', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '10', '活动-->商品，活动结束还库存，活动剩余=10,用户多抢=0', '0000-00-00 00:00:00');
+INSERT INTO `activity_goods_inventory_log` VALUES ('e4973bf8d14a448a987036ba94208424', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '-10', '商品-->活动', '0000-00-00 00:00:00');
+INSERT INTO `activity_goods_inventory_log` VALUES ('f7647b2757294a36bd48ffa7c4df8eb2', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '10', '活动-->商品', null);
+
+-- ----------------------------
+-- Table structure for `activity_order_relation`
+-- ----------------------------
+DROP TABLE IF EXISTS `activity_order_relation`;
+CREATE TABLE `activity_order_relation` (
+  `activity_id` varchar(32) NOT NULL COMMENT '秒杀活动ID',
+  `order_id` varchar(32) NOT NULL COMMENT '订单ID',
+  PRIMARY KEY (`activity_id`,`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='活动订单关联表';
+
+-- ----------------------------
+-- Records of activity_order_relation
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `goods`
@@ -48,14 +93,14 @@ CREATE TABLE `goods` (
   `goods_id` varchar(32) NOT NULL COMMENT '商品ID',
   `goods_name` varchar(512) NOT NULL COMMENT '商品名称',
   `goods_price` int(11) NOT NULL COMMENT '商品价格',
-  `goods_number` int(11) NOT NULL COMMENT '商品库存',
+  `goods_inventory` int(11) NOT NULL COMMENT '商品库存',
   PRIMARY KEY (`goods_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='商品信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='商品信息表';
 
 -- ----------------------------
 -- Records of goods
 -- ----------------------------
-INSERT INTO `goods` VALUES ('123456789101213141516171819203', 'rio275', '10000', '100');
+INSERT INTO `goods` VALUES ('123456789101213141516171819203', 'rio275', '10000', '9');
 
 -- ----------------------------
 -- Table structure for `img`
@@ -67,7 +112,7 @@ CREATE TABLE `img` (
   `img_url` varchar(256) NOT NULL COMMENT '展示图片url',
   `img_type` varchar(2) NOT NULL COMMENT '图片类型',
   PRIMARY KEY (`img_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='秒杀任务展示图片信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='秒杀任务展示图片信息表';
 
 -- ----------------------------
 -- Records of img
@@ -81,8 +126,11 @@ CREATE TABLE `order` (
   `order_id` varchar(32) NOT NULL COMMENT '主键ID',
   `user_id` varchar(32) NOT NULL,
   `goods_id` varchar(32) NOT NULL,
-  `goods_number` int(11) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `goods_number` int(11) NOT NULL,
+  `status` varchar(2) NOT NULL COMMENT '订单状态，0-创建，1-已支付，2-过期，9-删除',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='订单基本信息表';
 
 -- ----------------------------
 -- Records of order
@@ -99,11 +147,13 @@ CREATE TABLE `success_log` (
   `goods_number` int(11) NOT NULL COMMENT '实际秒杀到的商品数，有可能超过规定限制数',
   `create_time` datetime NOT NULL,
   PRIMARY KEY (`succlog_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='用户秒杀成功记录表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户秒杀成功记录表';
 
 -- ----------------------------
 -- Records of success_log
 -- ----------------------------
+INSERT INTO `success_log` VALUES ('08dec41a4508484b84b9a2b63f9caf93', '622b3431c58248fa83a35671095552b1', 'e2c9b3ca88ca48948d2d65c126972c47', '1', '2017-06-21 23:07:38');
+INSERT INTO `success_log` VALUES ('166740ef47fc4342bbae31f1caf63b4a', '622b3431c58248fa83a35671095552b1', 'e2c9b3ca88ca48948d2d65c126972c47', '1', '2017-06-21 23:03:37');
 
 -- ----------------------------
 -- Table structure for `user`
@@ -115,8 +165,9 @@ CREATE TABLE `user` (
   `user_pwd` varchar(32) NOT NULL COMMENT '用户密码',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `user_id` (`user_id`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='用户信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户信息表';
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
+INSERT INTO `user` VALUES ('622b3431c58248fa83a35671095552b1', 'ygy', '123456');
