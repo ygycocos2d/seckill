@@ -13,10 +13,12 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.entity.ActivityGoodsInventoryLogEntity;
+import org.ygy.common.seckill.entity.ActivityOrderRelationEntity;
 import org.ygy.common.seckill.entity.GoodsEntity;
 import org.ygy.common.seckill.entity.OrderEntity;
 import org.ygy.common.seckill.entity.SuccessLogEntity;
 import org.ygy.common.seckill.service.ActivityGoodsInventoryLogService;
+import org.ygy.common.seckill.service.ActivityOrderRelationService;
 import org.ygy.common.seckill.service.GoodsService;
 import org.ygy.common.seckill.service.OrderService;
 import org.ygy.common.seckill.service.SuccessLogService;
@@ -33,12 +35,15 @@ public class EndJob implements Job {
 	
 	private ActivityGoodsInventoryLogService inventoryLogService;
 	
+	private ActivityOrderRelationService relationService;
+	
 	public EndJob() {
 		try {
 			goodsService = (GoodsService) SpringContextUtil.getBeanByClass(GoodsService.class);
 			successLogService = (SuccessLogService) SpringContextUtil.getBeanByClass(SuccessLogService.class);
 			orderService = (OrderService) SpringContextUtil.getBeanByClass(OrderService.class);
 			inventoryLogService = (ActivityGoodsInventoryLogService) SpringContextUtil.getBeanByClass(ActivityGoodsInventoryLogService.class);
+			relationService = (ActivityOrderRelationService) SpringContextUtil.getBeanByClass(ActivityOrderRelationService.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -67,6 +72,7 @@ public class EndJob implements Job {
 		// 构建秒杀成功记录list
 		List<SuccessLogEntity> logEntityList = new ArrayList<SuccessLogEntity>();
 		List<OrderEntity> orderList = new ArrayList<OrderEntity>();//订单
+		List<ActivityOrderRelationEntity> relationList = new ArrayList<ActivityOrderRelationEntity>();//活动订单关联记录
 		int invalidSeckillTotalCount = 0;//无效商品总数，秒杀活动中即多抢了的商品数
 		Set<Entry<String, Integer>> set = killSucLog.entrySet();
 		Iterator<Entry<String, Integer>> iterator = set.iterator();
@@ -95,24 +101,64 @@ public class EndJob implements Job {
 			order.setUserId(en.getKey());
 			order.setStatus("0");//创建状态
 			orderList.add(order);
+			// 生成秒杀活动与订单的关联记录（其中可用于过期订单自动取消）
+			ActivityOrderRelationEntity relation = new ActivityOrderRelationEntity();
+			relation.setActivityId(tempInfo.getActivityId());
+			relation.setOrderId(order.getOrderId());
+			relationList.add(relation);
 		}
-		// 秒杀记录列表存库、订单列表存库
-		this.successLogService.batchAddSuccessLog(logEntityList);
-		this.orderService.batchAddOrder(orderList);
 		// 商品还库存
 		int toStock = tempInfo.getGoodsNum().intValue() + invalidSeckillTotalCount;
+		GoodsEntity goods = null;
+		ActivityGoodsInventoryLogEntity inventoryLog = null;
 		if (toStock > 0) {
-			GoodsEntity goods = this.goodsService.getGoodsById(tempInfo.getGoodsId());
-			goods.setGoodsNumber(goods.getGoodsNumber() + toStock);
-			this.goodsService.update(goods);
-			ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
+			goods = this.goodsService.getGoodsById(tempInfo.getGoodsId());
+			goods.setGoodsInventory(goods.getGoodsInventory() + toStock);
+			
+			inventoryLog = new ActivityGoodsInventoryLogEntity();
 			inventoryLog.setId(StringUtil.getUUID());
 			inventoryLog.setActivityId(tempInfo.getActivityId());
 			inventoryLog.setGoodsId(goods.getGoodsId());
 			inventoryLog.setGoodsInventory(toStock);
 			inventoryLog.setDescribt("活动-->商品，活动结束还库存，活动剩余="+tempInfo.getGoodsNum().intValue()+",用户多抢="+invalidSeckillTotalCount);
-			this.inventoryLogService.add(inventoryLog);
 		}
+		
+		int count = 10;//最多进行10次，10次以后数据丢就丢，老子不管了
+		boolean succLogFlag = false;
+		boolean orderFlag = false;
+		boolean goodsFlag = false;
+		boolean inventoryLogFlag = false;
+		boolean relarionFlag = false;
+		for(;;) {
+			// 秒杀记录列表存库、订单列表存库
+			if (!succLogFlag) {
+				this.successLogService.batchAddSuccessLog(logEntityList);
+				
+				//
+			}
+			if (!orderFlag) {
+				this.orderService.batchAddOrder(orderList);
+			}
+			if (!relarionFlag) {
+//				this.relationService.batchAdd(relationList);
+			}
+			if (!goodsFlag) {
+				this.goodsService.update(goods);
+			}
+			if (!inventoryLogFlag) {
+				this.inventoryLogService.add(inventoryLog);
+			}
+			if ( (succLogFlag&&orderFlag&&goodsFlag&&inventoryLogFlag) || count <= 0) {
+				break;
+			}
+			count --;
+		}
+		
+		// 秒杀生成的订单超时不支付自动取消
+		String name = tempInfo.getActivityId() + "_orderAutoCancel";
+		String group = tempInfo.getActivityGid() + "_orderAutoCancel";
+		Date date = new Date(System.currentTimeMillis() + 1000*tempInfo.getPayDelay());
+		SchedulerContext.getQuartzUtil().add(OrderAutoCancelJob.class, name, group, date);
 	}
 
 }

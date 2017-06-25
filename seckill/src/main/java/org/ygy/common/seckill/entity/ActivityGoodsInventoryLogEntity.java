@@ -11,9 +11,9 @@ public class ActivityGoodsInventoryLogEntity {
 
     private Integer goodsInventory;
 
-    private Date createTime;
-
     private String describt;
+
+    private Date createTime;
 
     public String getId() {
         return id;
@@ -47,19 +47,19 @@ public class ActivityGoodsInventoryLogEntity {
         this.goodsInventory = goodsInventory;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
     public String getDescribt() {
         return describt;
     }
 
     public void setDescribt(String describt) {
         this.describt = describt == null ? null : describt.trim();
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

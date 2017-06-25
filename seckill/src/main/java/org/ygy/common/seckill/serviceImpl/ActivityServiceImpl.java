@@ -29,11 +29,11 @@ public class ActivityServiceImpl implements ActivityService {
 	private ActivityGoodsInventoryLogDao nventoryLogDao;
 	
 	@Override
-	public ActivityEntity getEffectiveActivityById(String id) {
+	public ActivityEntity getNotDelActivityById(String id) {
 		if (StringUtil.isEmpty(id)) {
 			return null;
 		}
-		return this.activityDao.getById(id);
+		return this.activityDao.getNotDelActivityById(id);
 	}
 
 	@Override

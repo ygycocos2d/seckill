@@ -21,6 +21,7 @@
 	<bean id="inventoryLogService" class="org.ygy.common.seckill.serviceImpl.ActivityGoodsInventoryLogServiceImpl" />
 	<bean id="orderService" class="org.ygy.common.seckill.serviceImpl.OrderServiceImpl" />
 	<bean id="successLogService" class="org.ygy.common.seckill.serviceImpl.SuccessLogServiceImpl" />
+	<bean id="relationService" class="org.ygy.common.seckill.serviceImpl.ActivityOrderRelationServiceImpl" />
 	
 	<bean id="springContextUtil" class="org.ygy.common.seckill.util.SpringContextUtil" />
 </beans>

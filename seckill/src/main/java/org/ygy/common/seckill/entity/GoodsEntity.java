@@ -7,7 +7,7 @@ public class GoodsEntity {
 
     private Integer goodsPrice;
 
-    private Integer goodsNumber;
+    private Integer goodsInventory;
 
     public String getGoodsId() {
         return goodsId;
@@ -33,11 +33,11 @@ public class GoodsEntity {
         this.goodsPrice = goodsPrice;
     }
 
-    public Integer getGoodsNumber() {
-        return goodsNumber;
+    public Integer getGoodsInventory() {
+        return goodsInventory;
     }
 
-    public void setGoodsNumber(Integer goodsNumber) {
-        this.goodsNumber = goodsNumber;
+    public void setGoodsInventory(Integer goodsInventory) {
+        this.goodsInventory = goodsInventory;
     }
 }

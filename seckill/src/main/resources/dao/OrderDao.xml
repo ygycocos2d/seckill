@@ -1,54 +1,108 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="org.ygy.common.seckill.dao.OrderDao" >
-  <resultMap id="BaseResultMap" type="org.ygy.common.seckill.entity.OrderEntity" >
-    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
-    <result column="user_id" property="userId" jdbcType="VARCHAR" />
-    <result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
-    <result column="goods_number" property="goodsNumber" jdbcType="INTEGER" />
-    <result column="status" property="status" jdbcType="VARCHAR" />
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.ygy.common.seckill.dao.OrderDao">
+  <resultMap id="BaseResultMap" type="org.ygy.common.seckill.entity.OrderEntity">
+    <id column="order_id" jdbcType="VARCHAR" property="orderId" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="goods_id" jdbcType="VARCHAR" property="goodsId" />
+    <result column="goods_number" jdbcType="INTEGER" property="goodsNumber" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
-  <insert id="insert" parameterType="org.ygy.common.seckill.entity.OrderEntity" >
+  <sql id="Base_Column_List">
+    order_id, user_id, goods_id, goods_number, status, create_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from order
+    where order_id = #{orderId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from order
+    where order_id = #{orderId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="org.ygy.common.seckill.entity.OrderEntity">
     insert into order (order_id, user_id, goods_id, 
-      goods_number, status)
+      goods_number, status, create_time
+      )
     values (#{orderId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{goodsId,jdbcType=VARCHAR}, 
-      #{goodsNumber,jdbcType=INTEGER}, #{status,jdbcType=VARCHAR})
+      #{goodsNumber,jdbcType=INTEGER}, #{status,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
+      )
   </insert>
-  <insert id="insertSelective" parameterType="org.ygy.common.seckill.entity.OrderEntity" >
+  <insert id="insertSelective" parameterType="org.ygy.common.seckill.entity.OrderEntity">
     insert into order
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="orderId != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="orderId != null">
         order_id,
       </if>
-      <if test="userId != null" >
+      <if test="userId != null">
         user_id,
       </if>
-      <if test="goodsId != null" >
+      <if test="goodsId != null">
         goods_id,
       </if>
-      <if test="goodsNumber != null" >
+      <if test="goodsNumber != null">
         goods_number,
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         status,
       </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="orderId != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="orderId != null">
         #{orderId,jdbcType=VARCHAR},
       </if>
-      <if test="userId != null" >
+      <if test="userId != null">
         #{userId,jdbcType=VARCHAR},
       </if>
-      <if test="goodsId != null" >
+      <if test="goodsId != null">
         #{goodsId,jdbcType=VARCHAR},
       </if>
-      <if test="goodsNumber != null" >
+      <if test="goodsNumber != null">
         #{goodsNumber,jdbcType=INTEGER},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.ygy.common.seckill.entity.OrderEntity">
+    update order
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsId != null">
+        goods_id = #{goodsId,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsNumber != null">
+        goods_number = #{goodsNumber,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where order_id = #{orderId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.ygy.common.seckill.entity.OrderEntity">
+    update order
+    set user_id = #{userId,jdbcType=VARCHAR},
+      goods_id = #{goodsId,jdbcType=VARCHAR},
+      goods_number = #{goodsNumber,jdbcType=INTEGER},
+      status = #{status,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where order_id = #{orderId,jdbcType=VARCHAR}
+  </update>
 </mapper>

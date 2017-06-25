@@ -6,11 +6,11 @@
     <result column="activity_id" property="activityId" jdbcType="VARCHAR" />
     <result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
     <result column="goods_inventory" property="goodsInventory" jdbcType="INTEGER" />
-    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="describt" property="describt" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, activity_id, goods_id, goods_inventory, create_time, describt
+    id, activity_id, goods_id, goods_inventory, describt, create_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -24,10 +24,10 @@
   </delete>
   <insert id="insert" parameterType="org.ygy.common.seckill.entity.ActivityGoodsInventoryLogEntity" >
     insert into activity_goods_inventory_log (id, activity_id, goods_id, 
-      goods_inventory, create_time, describt
+      goods_inventory, describt, create_time
       )
     values (#{id,jdbcType=VARCHAR}, #{activityId,jdbcType=VARCHAR}, #{goodsId,jdbcType=VARCHAR}, 
-      #{goodsInventory,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{describt,jdbcType=VARCHAR}
+      #{goodsInventory,jdbcType=INTEGER}, #{describt,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="org.ygy.common.seckill.entity.ActivityGoodsInventoryLogEntity" >
@@ -45,11 +45,11 @@
       <if test="goodsInventory != null" >
         goods_inventory,
       </if>
-      <if test="createTime != null" >
-        create_time,
-      </if>
       <if test="describt != null" >
         describt,
+      </if>
+      <if test="createTime != null" >
+        create_time,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -65,11 +65,11 @@
       <if test="goodsInventory != null" >
         #{goodsInventory,jdbcType=INTEGER},
       </if>
-      <if test="createTime != null" >
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="describt != null" >
         #{describt,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -85,11 +85,11 @@
       <if test="goodsInventory != null" >
         goods_inventory = #{goodsInventory,jdbcType=INTEGER},
       </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="describt != null" >
         describt = #{describt,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
@@ -99,8 +99,8 @@
     set activity_id = #{activityId,jdbcType=VARCHAR},
       goods_id = #{goodsId,jdbcType=VARCHAR},
       goods_inventory = #{goodsInventory,jdbcType=INTEGER},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      describt = #{describt,jdbcType=VARCHAR}
+      describt = #{describt,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=VARCHAR}
   </update>
 </mapper>

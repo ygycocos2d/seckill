@@ -14,7 +14,7 @@ public interface ActivityService {
 	 * @param id
 	 * @return
 	 */
-	ActivityEntity getEffectiveActivityById(String id);
+	ActivityEntity getNotDelActivityById(String id);
 
 	ActivityEntity getEntityById(String activityId);
 

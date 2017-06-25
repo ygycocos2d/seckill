@@ -78,5 +78,9 @@ public class TestController {
 //			// TODO: handle exception
 //		}
 //		System.out.println("---main end-----------");
+		
+		String jobName = "jsdkfhsdfjsl_1l";
+		String activityId = jobName .substring(0, jobName.indexOf("_"));
+		System.out.println(activityId);
 	}
 }

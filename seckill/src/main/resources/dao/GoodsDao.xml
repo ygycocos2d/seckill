@@ -5,10 +5,10 @@
     <id column="goods_id" property="goodsId" jdbcType="VARCHAR" />
     <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
     <result column="goods_price" property="goodsPrice" jdbcType="INTEGER" />
-    <result column="goods_number" property="goodsNumber" jdbcType="INTEGER" />
+    <result column="goods_inventory" property="goodsInventory" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    goods_id, goods_name, goods_price, goods_number
+    goods_id, goods_name, goods_price, goods_inventory
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -22,9 +22,9 @@
   </delete>
   <insert id="insert" parameterType="org.ygy.common.seckill.entity.GoodsEntity" >
     insert into goods (goods_id, goods_name, goods_price, 
-      goods_number)
+      goods_inventory)
     values (#{goodsId,jdbcType=VARCHAR}, #{goodsName,jdbcType=VARCHAR}, #{goodsPrice,jdbcType=INTEGER}, 
-      #{goodsNumber,jdbcType=INTEGER})
+      #{goodsInventory,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="org.ygy.common.seckill.entity.GoodsEntity" >
     insert into goods
@@ -38,8 +38,8 @@
       <if test="goodsPrice != null" >
         goods_price,
       </if>
-      <if test="goodsNumber != null" >
-        goods_number,
+      <if test="goodsInventory != null" >
+        goods_inventory,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -52,8 +52,8 @@
       <if test="goodsPrice != null" >
         #{goodsPrice,jdbcType=INTEGER},
       </if>
-      <if test="goodsNumber != null" >
-        #{goodsNumber,jdbcType=INTEGER},
+      <if test="goodsInventory != null" >
+        #{goodsInventory,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -66,8 +66,8 @@
       <if test="goodsPrice != null" >
         goods_price = #{goodsPrice,jdbcType=INTEGER},
       </if>
-      <if test="goodsNumber != null" >
-        goods_number = #{goodsNumber,jdbcType=INTEGER},
+      <if test="goodsInventory != null" >
+        goods_inventory = #{goodsInventory,jdbcType=INTEGER},
       </if>
     </set>
     where goods_id = #{goodsId,jdbcType=VARCHAR}
@@ -76,7 +76,7 @@
     update goods
     set goods_name = #{goodsName,jdbcType=VARCHAR},
       goods_price = #{goodsPrice,jdbcType=INTEGER},
-      goods_number = #{goodsNumber,jdbcType=INTEGER}
+      goods_inventory = #{goodsInventory,jdbcType=INTEGER}
     where goods_id = #{goodsId,jdbcType=VARCHAR}
   </update>
 </mapper>

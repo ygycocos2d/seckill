@@ -1,5 +1,7 @@
 package org.ygy.common.seckill.entity;
 
+import java.util.Date;
+
 public class OrderEntity {
     private String orderId;
 
@@ -10,6 +12,8 @@ public class OrderEntity {
     private Integer goodsNumber;
 
     private String status;
+
+    private Date createTime;
 
     public String getOrderId() {
         return orderId;
@@ -49,5 +53,13 @@ public class OrderEntity {
 
     public void setStatus(String status) {
         this.status = status == null ? null : status.trim();
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

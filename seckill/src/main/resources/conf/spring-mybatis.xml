@@ -99,18 +99,17 @@
 			<tx:method name="modify*" propagation="REQUIRED" />
 			<tx:method name="remove*" propagation="REQUIRED" />
 			<tx:method name="do*" propagation="REQUIRED" />
-			<tx:method name="bind*" propagation="REQUIRED" />
-			<tx:method name="regsiter*" propagation="REQUIRED" />
-			<tx:method name="handle*" propagation="REQUIRED" />
-			<tx:method name="forward*" propagation="REQUIRED" />
-			<tx:method name="cash*" propagation="REQUIRED" />
-			<tx:method name="returnUnionBind" propagation="REQUIRED" />
-			<tx:method name="refund" propagation="REQUIRED" />
-			<tx:method name="payResNotify" propagation="REQUIRED" />
 			
 			<tx:method name="*" read-only="true" />
 		</tx:attributes>
 	</tx:advice>
+	
+	<aop:config>    
+        <!-- 第一个"*"代表所有类, 第二个"*"代表所有方法, ".."代表任意参数 -->    
+        <aop:pointcut id="pointcut" expression="execution(* org.ygy.common.seckill.service.*.*(..))" />    
+        <!-- 把事务控制在service层 -->    
+        <aop:advisor pointcut-ref="pointcut" advice-ref="transactionAdvice" />    
+    </aop:config>
 	
 	</beans>
 	

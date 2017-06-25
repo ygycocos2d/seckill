@@ -71,7 +71,8 @@ public class StartJob implements Job {
 			curActivity.setGoodsPrice(entity.getGoodsPrice());
 			curActivity.setNumLimit(entity.getLimitNumber());
 			curActivity.setStatus(entity.getStatus());
-			curActivity.setTaskDescribt(entity.getDescribt());
+			curActivity.setPayDelay(entity.getPayDelay());
+			curActivity.setDescribt(entity.getDescribt());
 		} catch (Exception e) {
 			System.out.println("entity2Info异常"+e);
 		}

@@ -146,43 +146,47 @@ public class ActivityController {
 			String[] ids = activityIdList.split(",");
 			List<String> idList = Arrays.asList(ids);
 			Set<String> set = new HashSet<String>(idList);
-			// 获取所有有效的且可修改状态的秒杀活动
 			for (String id:set) {
-				ActivityEntity activity = this.activityService.getEffectiveActivityById(id);
-				String oldStatus = activity.getStatus();
-				if (null != activity && !oldStatus.equals(status)) {
-					activity.setStatus(status);
-					//暂停-->启动，减库存
-					if ("1".equals(oldStatus) && "0".equals(status)) {
-						GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
-						if (activity.getGoodsNumber() <= goods.getGoodsNumber()) {
-							goods.setGoodsNumber(goods.getGoodsNumber()-activity.getGoodsNumber());
+				// 未开始且可修改状态（未删除的）的秒杀活动
+				ActivityEntity activity = this.activityService.getNotDelActivityById(id);
+				if (null != activity) {
+					String oldStatus = activity.getStatus();
+					if (null != oldStatus && !oldStatus.equals(status)) {
+						activity.setStatus(status);
+						//暂停-->启动，减库存
+						if ("1".equals(oldStatus) && "0".equals(status)) {
+							GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
+							if (activity.getGoodsNumber() <= goods.getGoodsInventory()) {
+								goods.setGoodsInventory(goods.getGoodsInventory()-activity.getGoodsNumber());
+								ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
+								inventoryLog.setId(StringUtil.getUUID());
+								inventoryLog.setActivityId(activity.getActivityId());
+								inventoryLog.setGoodsId(goods.getGoodsId());
+								inventoryLog.setGoodsInventory(-(activity.getGoodsNumber()));
+								inventoryLog.setDescribt("商品-->活动");
+								inventoryLog.setCreateTime(new Date());
+								this.activityService.updateActivityAndGoods(activity,goods,inventoryLog);
+							} else {
+								result.put("status", 1);
+								result.put("msg", "商品'"+goods.getGoodsName()+"'库存不足");
+								return result;
+							}
+						}
+						//启动-->暂停、删除，还库存
+						else if ("0".equals(oldStatus) && !"0".equals(status)) {
+							GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
+							goods.setGoodsInventory(goods.getGoodsInventory()+activity.getGoodsNumber());
 							ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
 							inventoryLog.setId(StringUtil.getUUID());
 							inventoryLog.setActivityId(activity.getActivityId());
 							inventoryLog.setGoodsId(goods.getGoodsId());
-							inventoryLog.setGoodsInventory(-(activity.getGoodsNumber()));
-							inventoryLog.setDescribt("商品-->活动");
+							inventoryLog.setGoodsInventory(activity.getGoodsNumber());
+							inventoryLog.setDescribt("活动-->商品");
 							this.activityService.updateActivityAndGoods(activity,goods,inventoryLog);
-						} else {
-							result.put("status", 1);
-							result.put("msg", "商品'"+goods.getGoodsName()+"'库存不足");
-							return result;
+						} else {//暂停-->删除，只是改状态
+							this.activityService.update(activity);
 						}
 					}
-					//启动-->暂停、删除，还库存
-					else if ("0".equals(oldStatus) && !"0".equals(status)) {
-						GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
-						goods.setGoodsNumber(goods.getGoodsNumber()+activity.getGoodsNumber());
-						ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
-						inventoryLog.setId(StringUtil.getUUID());
-						inventoryLog.setActivityId(activity.getActivityId());
-						inventoryLog.setGoodsId(goods.getGoodsId());
-						inventoryLog.setGoodsInventory(activity.getGoodsNumber());
-						inventoryLog.setDescribt("活动-->商品");
-						this.activityService.updateActivityAndGoods(activity,goods,inventoryLog);
-					}
-					this.activityService.update(activity);
 				}
 			}
 			result.put("status", 0);	
@@ -215,30 +219,30 @@ public class ActivityController {
 			return result;
 		}
 		try {
-			for(;;) {
-				ActivityEntity entity = this.activityService.getEntityById(activityId);
-				if (null != entity) {
-					int oldLeftGoodsNum = entity.getLeftGoodsNumber();
-					if (number <= oldLeftGoodsNum) {
-						int newLeftGoodsNum = oldLeftGoodsNum - number;
-//						entity.setCurAppGoodsNum(number);
-						entity.setLeftGoodsNumber(newLeftGoodsNum);
-						boolean ok = this.activityService.updateWhenUnchanged(entity, oldLeftGoodsNum);
-						if (ok) {
-							// 存储该秒杀活动在当前应用中处理的商品量
-							SchedulerContext.setCurAppHandleGoodsNum(activityId, number);
-							result.put("status", 0);
-							break;
-						}
-					} else {
-						result.put("msg", "该应用设置的商品处理量大于秒杀活动总的商品量");
-						break;
-					}
-				} else {
-					result.put("msg", "该秒杀活动不存在");
-					break;
-				}
-			}
+//			for(;;) {
+//				ActivityEntity entity = this.activityService.getEntityById(activityId);
+//				if (null != entity) {
+//					int oldLeftGoodsNum = entity.getLeftGoodsNumber();
+//					if (number <= oldLeftGoodsNum) {
+//						int newLeftGoodsNum = oldLeftGoodsNum - number;
+////						entity.setCurAppGoodsNum(number);
+//						entity.setLeftGoodsNumber(newLeftGoodsNum);
+//						boolean ok = this.activityService.updateWhenUnchanged(entity, oldLeftGoodsNum);
+//						if (ok) {
+//							// 存储该秒杀活动在当前应用中处理的商品量
+//							SchedulerContext.setCurAppHandleGoodsNum(activityId, number);
+//							result.put("status", 0);
+//							break;
+//						}
+//					} else {
+//						result.put("msg", "该应用设置的商品处理量大于秒杀活动总的商品量");
+//						break;
+//					}
+//				} else {
+//					result.put("msg", "该秒杀活动不存在");
+//					break;
+//				}
+//			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			result.put("status", -1);
@@ -324,7 +328,7 @@ public class ActivityController {
 				activity.setGroupId(StringUtil.getUUID());
 				if (Constant.ACTIVITY_STATUS_START.equals(dto.getStatus())) {
 					GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
-					goods.setGoodsNumber(goods.getGoodsNumber()-activity.getGoodsNumber());
+					goods.setGoodsInventory(goods.getGoodsInventory()-activity.getGoodsNumber());
 					ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
 					inventoryLog.setId(StringUtil.getUUID());
 					inventoryLog.setActivityId(activity.getActivityId());
@@ -364,7 +368,7 @@ public class ActivityController {
 						//暂停-->启动，减库存
 						if ("1".equals(en.getStatus()) && "0".equals(activity.getStatus())) {
 							GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
-							goods.setGoodsNumber(goods.getGoodsNumber()-activity.getGoodsNumber());
+							goods.setGoodsInventory(goods.getGoodsInventory()-activity.getGoodsNumber());
 							ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
 							inventoryLog.setId(StringUtil.getUUID());
 							inventoryLog.setActivityId(activity.getActivityId());
@@ -376,7 +380,7 @@ public class ActivityController {
 						//启动-->暂停、删除，还库存
 						else if ("0".equals(en.getStatus()) && !"0".equals(activity.getStatus())) {
 							GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
-							goods.setGoodsNumber(goods.getGoodsNumber()+activity.getGoodsNumber());
+							goods.setGoodsInventory(goods.getGoodsInventory()+activity.getGoodsNumber());
 							ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
 							inventoryLog.setId(StringUtil.getUUID());
 							inventoryLog.setActivityId(activity.getActivityId());
@@ -479,7 +483,7 @@ public class ActivityController {
 				result.put("status", 1);
 				result.put("msg", "秒杀商品不存在");
 				return result;
-			} else if (goods.getGoodsNumber() < dto.getGoodsNumber()){
+			} else if (goods.getGoodsInventory() < dto.getGoodsNumber()){
 				result.put("status", 1);
 				result.put("msg", "秒杀商品数不能大于商品库存数");
 				return result;

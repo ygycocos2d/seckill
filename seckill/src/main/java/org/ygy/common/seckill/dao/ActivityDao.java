@@ -18,7 +18,7 @@ public interface ActivityDao {
 
     int updateByPrimaryKey(ActivityEntity record);
 
-	ActivityEntity getById(String id);
+	ActivityEntity getNotDelActivityById(String id);
 
 	List<ActivityEntity> getAllEffectiveActivity();
 

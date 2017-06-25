@@ -26,18 +26,14 @@ public class ActivityInfo {
 
     private String goodsId;
 
-//    private Integer taskGoodsnum;
-
     //当前部署应用的任务状态，不代表集群中所有任务的状态（即数据库中任务的状态）
-    private String status;//
-
-    private Integer appNum;
-
-    private String numInApp;
+    private String status;
 
     private Integer goodsPrice;
+    
+    private Integer payDelay;
 
-    private String taskDescribt;
+    private String describt;
 
 	public AtomicIntegerExt getGoodsNum() {
 		return goodsNum;
@@ -79,36 +75,12 @@ public class ActivityInfo {
 		this.status = status;
 	}
 
-	public Integer getAppNum() {
-		return appNum;
-	}
-
-	public void setAppNum(Integer appNum) {
-		this.appNum = appNum;
-	}
-
-	public String getNumInApp() {
-		return numInApp;
-	}
-
-	public void setNumInApp(String numInApp) {
-		this.numInApp = numInApp;
-	}
-
 	public Integer getGoodsPrice() {
 		return goodsPrice;
 	}
 
 	public void setGoodsPrice(Integer goodsPrice) {
 		this.goodsPrice = goodsPrice;
-	}
-
-	public String getTaskDescribt() {
-		return taskDescribt;
-	}
-
-	public void setTaskDescribt(String taskDescribt) {
-		this.taskDescribt = taskDescribt;
 	}
 
 	public int getNumLimit() {
@@ -147,6 +119,22 @@ public class ActivityInfo {
 
 	public void setImgList(List<ImgEntity> imgList) {
 		this.imgList = imgList;
+	}
+
+	public String getDescribt() {
+		return describt;
+	}
+
+	public void setDescribt(String describt) {
+		this.describt = describt;
+	}
+
+	public Integer getPayDelay() {
+		return payDelay;
+	}
+
+	public void setPayDelay(Integer payDelay) {
+		this.payDelay = payDelay;
 	}
 
 }

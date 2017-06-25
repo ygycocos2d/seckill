@@ -17,8 +17,6 @@ public class ActivityEntity {
 
     private Integer goodsNumber;
 
-    private Integer leftGoodsNumber;
-
     private Integer limitNumber;
 
     private Integer payDelay;
@@ -81,14 +79,6 @@ public class ActivityEntity {
 
     public void setGoodsNumber(Integer goodsNumber) {
         this.goodsNumber = goodsNumber;
-    }
-
-    public Integer getLeftGoodsNumber() {
-        return leftGoodsNumber;
-    }
-
-    public void setLeftGoodsNumber(Integer leftGoodsNumber) {
-        this.leftGoodsNumber = leftGoodsNumber;
     }
 
     public Integer getLimitNumber() {
