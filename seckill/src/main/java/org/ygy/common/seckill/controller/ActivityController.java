@@ -19,11 +19,13 @@ import org.ygy.common.seckill.dto.ActivityDTO;
 import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.entity.ActivityGoodsInventoryLogEntity;
 import org.ygy.common.seckill.entity.GoodsEntity;
+import org.ygy.common.seckill.entity.OrderEntity;
 import org.ygy.common.seckill.entity.UserEntity;
 import org.ygy.common.seckill.scheduler.ActivityInfo;
 import org.ygy.common.seckill.scheduler.SchedulerContext;
 import org.ygy.common.seckill.service.ActivityService;
 import org.ygy.common.seckill.service.GoodsService;
+import org.ygy.common.seckill.service.OrderService;
 import org.ygy.common.seckill.util.AtomicIntegerExt;
 import org.ygy.common.seckill.util.Constant;
 import org.ygy.common.seckill.util.StringUtil;
@@ -53,6 +55,9 @@ public class ActivityController {
 	
 	@Resource
 	private GoodsService goodsService;
+	
+	@Resource
+	private OrderService orderService;
 
 	/**
 	 * 秒杀
@@ -91,29 +96,28 @@ public class ActivityController {
 	}
 	
 	/**
-	 * 支付
+	 * 模拟支付（改订单状态）
 	 * @param request
-	 * @return status -1-系统异常，0-成功，1-该用户已达秒杀数量上限
+	 * @return status -1-系统异常，0-成功，1-该订单不存在
 	 */
 	@RequestMapping("pay")
 	@ResponseBody
-	public Map<String,Object> pay(HttpServletRequest request,String activityId) {
+	public Map<String,Object> pay(HttpServletRequest request,String orderId) {
 		Map<String,Object> result = new HashMap<String,Object>();
 		result.put("status", 0);
 		try {
-			String userId = (String) request.getSession(true).getAttribute("userId");
-			int num = SchedulerContext.getSucLog().get(userId);
-			ActivityInfo currentTask = SchedulerContext.getCurActivityInfo();
-			// 是否达秒杀上限
-			if (num < currentTask.getNumLimit()) {
-				AtomicIntegerExt goodsNum = currentTask.getGoodsNum();
-				// goods没被秒杀完，则秒杀成功，存记录
-				if (goodsNum.getAndDecrementWhenGzero() > 0) {
-					SchedulerContext.getSucLog().set(userId, (num+1));
-				}
+			String userId = "";
+			UserEntity user = (UserEntity) request.getSession(true).getAttribute("user");
+			if (null != user) {
+				userId = user.getUserId();
+			}
+			OrderEntity order = this.orderService.getOrderByIdAndUserId(orderId, userId);
+			if (null != order) {
+				order.setStatus(Constant.ORDER_STATUS_PAYED);//模拟支付，只是改个状态
+				this.orderService.update(order);
 			} else {
-				// 秒杀已达数量上限
 				result.put("status", 1);
+				result.put("msg", "该订单不存在！");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

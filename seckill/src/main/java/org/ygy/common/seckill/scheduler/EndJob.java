@@ -140,7 +140,7 @@ public class EndJob implements Job {
 				this.orderService.batchAddOrder(orderList);
 			}
 			if (!relarionFlag) {
-//				this.relationService.batchAdd(relationList);
+				this.relationService.batchAdd(relationList);
 			}
 			if (!goodsFlag) {
 				this.goodsService.update(goods);

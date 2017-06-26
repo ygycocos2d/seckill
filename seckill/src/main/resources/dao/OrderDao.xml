@@ -14,6 +14,27 @@
   <sql id="Base_Column_List">
     order_id, user_id, goods_id, goods_number, status, create_time
   </sql>
+  
+  <select id="selectOrderByIdAndUserId" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from order
+    where order_id = #{orderId,jdbcType=VARCHAR} and user_id = #{userId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByOrderIdListAndStatus" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from order
+    where status = #{status,jdbcType=VARCHAR} 
+	<if test="orderIdList != null and orderIdList.size() > 0">
+		and order_id in
+		<foreach item="orderId" collection="orderIdList" open="(" separator="," close=")">
+			#{orderId}
+		</foreach>
+	</if>
+  </select>
+  
+  <!--  -->
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />

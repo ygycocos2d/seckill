@@ -9,8 +9,12 @@ public interface OrderService {
 
 	void batchAddOrder(List<OrderEntity> orderList);
 
-	List<OrderEntity> getByOrderIdListAndStatus(Map<String, Object> param);
-
 	void autoCancelOrderList(List<OrderEntity> orderList);
+
+	OrderEntity getOrderByIdAndUserId(String orderId, String userId);
+
+	void update(OrderEntity order);
+
+	List<OrderEntity> getByOrderIdListAndStatus(Map<String, Object> param);
 
 }

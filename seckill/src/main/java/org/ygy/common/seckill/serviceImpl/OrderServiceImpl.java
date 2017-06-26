@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.util.StringUtils;
 import org.ygy.common.seckill.dao.GoodsDao;
 import org.ygy.common.seckill.dao.OrderDao;
 import org.ygy.common.seckill.entity.GoodsEntity;
@@ -30,8 +31,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public List<OrderEntity> getByOrderIdListAndStatus(Map<String, Object> param) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.orderDao.selectByOrderIdListAndStatus(param);
 	}
 
 	@Override
@@ -55,6 +55,22 @@ public class OrderServiceImpl implements OrderService {
 			goods.setGoodsInventory(goods.getGoodsInventory() + goodsNumber);
 			this.goodsDao.updateByPrimaryKey(goods);
 		}
+	}
+
+	@Override
+	public OrderEntity getOrderByIdAndUserId(String orderId, String userId) {
+		if (StringUtils.isEmpty(orderId) || StringUtils.isEmpty(userId)) {
+			return null;
+		}
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("orderId", orderId);
+		param.put("userId", userId);
+		return this.orderDao.selectOrderByIdAndUserId(param);
+	}
+
+	@Override
+	public void update(OrderEntity order) {
+		this.orderDao.updateByPrimaryKeySelective(order);
 	}
 
 }
