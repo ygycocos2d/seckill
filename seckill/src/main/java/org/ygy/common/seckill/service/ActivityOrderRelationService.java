@@ -8,6 +8,6 @@ public interface ActivityOrderRelationService {
 
 	List<String> getOrderIdListByActivityId(String activityId);
 
-	void batchAdd(List<ActivityOrderRelationEntity> relationList);
+	void addBatch(List<ActivityOrderRelationEntity> relationList);
 
 }

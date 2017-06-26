@@ -6,6 +6,6 @@ import org.ygy.common.seckill.entity.SuccessLogEntity;
 
 public interface SuccessLogService {
 
-	void batchAddSuccessLog(List<SuccessLogEntity> logEntityList);
+	void addSuccessLogBatch(List<SuccessLogEntity> logEntityList);
 
 }

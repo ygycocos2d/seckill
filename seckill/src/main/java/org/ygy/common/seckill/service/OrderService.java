@@ -7,7 +7,7 @@ import org.ygy.common.seckill.entity.OrderEntity;
 
 public interface OrderService {
 
-	void batchAddOrder(List<OrderEntity> orderList);
+	void addOrderBatch(List<OrderEntity> orderList);
 
 	void autoCancelOrderList(List<OrderEntity> orderList);
 

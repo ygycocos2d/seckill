@@ -13,4 +13,6 @@ public interface ActivityOrderRelationDao {
     int insertSelective(ActivityOrderRelationEntity record);
 
 	List<String> selectOrderIdListByActivityId(String activityId);
+
+	void insertBatch(List<ActivityOrderRelationEntity> relationList);
 }

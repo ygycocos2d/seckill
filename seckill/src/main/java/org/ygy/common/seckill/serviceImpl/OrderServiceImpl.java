@@ -23,9 +23,9 @@ public class OrderServiceImpl implements OrderService {
 	private GoodsDao goodsDao;
 
 	@Override
-	public void batchAddOrder(List<OrderEntity> orderList) {
+	public void addOrderBatch(List<OrderEntity> orderList) {
 		if (null != orderList && orderList.size() > 0) {
-			
+			this.orderDao.insertOrderBatch(orderList);
 		}
 	}
 

@@ -33,6 +33,15 @@
 		</foreach>
 	</if>
   </select>
+  <insert id="insertOrderBatch" parameterType="java.util.List" >
+    insert into 
+    order (order_id, user_id, goods_id, goods_number, status, create_time)
+    values 
+    <foreach collection="list" item="item" index="index" separator="," >   
+        (#{item.orderId,jdbcType=VARCHAR}, #{item.userId,jdbcType=VARCHAR}, #{item.goodsId,jdbcType=VARCHAR}, 
+      #{item.goodsNumber,jdbcType=INTEGER}, #{item.status,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP})
+    </foreach>
+  </insert>
   
   <!--  -->
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">

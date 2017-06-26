@@ -17,5 +17,5 @@ public interface SuccessLogDao {
 
     int updateByPrimaryKey(SuccessLogEntity record);
 
-	int batchAddSuccessLog(List<SuccessLogEntity> logEntityList);
+	int insertSuccessLogBatch(List<SuccessLogEntity> logEntityList);
 }

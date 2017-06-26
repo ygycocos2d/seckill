@@ -12,7 +12,19 @@
     from activity_order_relation
     where activity_id = #{activityId,jdbcType=VARCHAR}
   </select>
+  <insert id="insertBatch" parameterType="java.util.List" >
+    insert into 
+    activity_order_relation (activity_id, order_id)
+    values 
+    <foreach collection="list" item="item" index="index" separator="," >   
+        (
+        #{item.activityId,jdbcType=VARCHAR},
+        #{item.orderId,jdbcType=VARCHAR}
+        )
+    </foreach>
+  </insert>
   
+  <!--  -->
   <delete id="deleteByPrimaryKey" parameterType="org.ygy.common.seckill.entity.ActivityOrderRelationEntity" >
     delete from activity_order_relation
     where activity_id = #{activityId,jdbcType=VARCHAR}

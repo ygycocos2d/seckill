@@ -14,9 +14,10 @@ public class ActivityOrderRelationServiceImpl implements ActivityOrderRelationSe
 		return relationDao.selectOrderIdListByActivityId(activityId);
 	}
 	@Override
-	public void batchAdd(List<ActivityOrderRelationEntity> relationList) {
-		// TODO Auto-generated method stub
-		
+	public void addBatch(List<ActivityOrderRelationEntity> relationList) {
+		if (null != relationList && relationList.isEmpty()) {
+			this.relationDao.insertBatch(relationList);
+		}
 	}
 
 }

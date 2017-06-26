@@ -23,4 +23,6 @@ public interface OrderDao {
 	OrderEntity selectOrderByIdAndUserId(Map<String, Object> param);
 
 	List<OrderEntity> selectByOrderIdListAndStatus(Map<String, Object> param);
+
+	void insertOrderBatch(List<OrderEntity> orderList);
 }

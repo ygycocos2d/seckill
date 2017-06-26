@@ -82,5 +82,7 @@ public class TestController {
 		String jobName = "jsdkfhsdfjsl_1l";
 		String activityId = jobName .substring(0, jobName.indexOf("_"));
 		System.out.println(activityId);
+		
+		System.out.println("自动取消订单:"+new Date(System.currentTimeMillis()));
 	}
 }

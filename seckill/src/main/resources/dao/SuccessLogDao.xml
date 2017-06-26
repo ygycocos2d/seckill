@@ -11,14 +11,23 @@
   <sql id="Base_Column_List" >
     succlog_id, user_id, activity_id, goods_number, create_time
   </sql>
+<!--   <typeAlias alias="succLog" type="org.ygy.common.seckill.entity.SuccessLogEntity" /> 
+  <parameterMap class="user" id="Users"> 
+    <parameter property="userID"/> 
+  </parameterMap>  -->
   
-  <insert id="batchAddSuccessLog" parameterType="java.util.List" >
+  <insert id="insertSuccessLogBatch" parameterType="java.util.List" >
     insert into 
     success_log (succlog_id, user_id, activity_id, goods_number, create_time)
     values 
     <foreach collection="list" item="item" index="index" separator="," >   
-        (#{item.succlogId,jdbcType=VARCHAR}, #{item.userId,jdbcType=VARCHAR}, #{item.activityId,jdbcType=VARCHAR}, 
-      #{item.goodsNumber,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP})
+        (
+        #{item.succlogId,jdbcType=VARCHAR}, 
+        #{item.userId,jdbcType=VARCHAR}, 
+        #{item.activityId,jdbcType=VARCHAR}, 
+      	#{item.goodsNumber,jdbcType=INTEGER}, 
+      	#{item.createTime,jdbcType=TIMESTAMP}
+      	)
     </foreach>
   </insert>
   

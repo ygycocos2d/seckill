@@ -1,5 +1,6 @@
 package org.ygy.common.seckill.scheduler;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,23 +32,24 @@ public class OrderAutoCancelJob implements Job{
 	@Override
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
-		String jobName = context.getJobDetail().getKey().getName();
-		String activityId = jobName.substring(0, jobName.indexOf("_"));
-		for (;;) {
-			try {
-				List<String> orderIdList = relationService.getOrderIdListByActivityId(activityId);
-				if (null != orderIdList && !orderIdList.isEmpty()) {
-					Map<String, Object> param = new HashMap<String, Object>();
-					param.put("orderIdList", orderIdList);
-					param.put("status", Constant.ORDER_STATUS_PAYING);
-					List<OrderEntity> orderList = orderService.getByOrderIdListAndStatus(param);
-					orderService.autoCancelOrderList(orderList);
-				}
-				break;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		System.out.println("自动取消订单:"+new Date(System.currentTimeMillis()));
+//		String jobName = context.getJobDetail().getKey().getName();
+//		String activityId = jobName.substring(0, jobName.indexOf("_"));
+//		for (;;) {
+//			try {
+//				List<String> orderIdList = relationService.getOrderIdListByActivityId(activityId);
+//				if (null != orderIdList && !orderIdList.isEmpty()) {
+//					Map<String, Object> param = new HashMap<String, Object>();
+//					param.put("orderIdList", orderIdList);
+//					param.put("status", Constant.ORDER_STATUS_PAYING);
+//					List<OrderEntity> orderList = orderService.getByOrderIdListAndStatus(param);
+//					orderService.autoCancelOrderList(orderList);
+//				}
+//				break;
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
 	}
 
 }

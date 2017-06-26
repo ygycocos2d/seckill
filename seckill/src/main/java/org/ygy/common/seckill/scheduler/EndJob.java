@@ -129,18 +129,18 @@ public class EndJob implements Job {
 		boolean goodsFlag = false;
 		boolean inventoryLogFlag = false;
 		boolean relarionFlag = false;
-		for(;;) {
+//		for(;;) {
 			// 秒杀记录列表存库、订单列表存库
 			if (!succLogFlag) {
-				this.successLogService.batchAddSuccessLog(logEntityList);
+				this.successLogService.addSuccessLogBatch(logEntityList);
 				
 				//
 			}
 			if (!orderFlag) {
-				this.orderService.batchAddOrder(orderList);
+				this.orderService.addOrderBatch(orderList);
 			}
 			if (!relarionFlag) {
-				this.relationService.batchAdd(relationList);
+				this.relationService.addBatch(relationList);
 			}
 			if (!goodsFlag) {
 				this.goodsService.update(goods);
@@ -149,10 +149,10 @@ public class EndJob implements Job {
 				this.inventoryLogService.add(inventoryLog);
 			}
 			if ( (succLogFlag&&orderFlag&&goodsFlag&&inventoryLogFlag) || count <= 0) {
-				break;
+//				break;
 			}
 			count --;
-		}
+//		}
 		
 		// 秒杀生成的订单超时不支付自动取消
 		String name = tempInfo.getActivityId() + "_orderAutoCancel";
