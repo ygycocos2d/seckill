@@ -9,7 +9,7 @@ public interface OrderService {
 
 	void addOrderBatch(List<OrderEntity> orderList);
 
-	void autoCancelOrderList(List<OrderEntity> orderList);
+	void cancelOrderListAuto(List<OrderEntity> orderList, String activityId);
 
 	OrderEntity getOrderByIdAndUserId(String orderId, String userId);
 

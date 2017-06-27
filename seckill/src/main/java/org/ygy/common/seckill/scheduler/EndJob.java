@@ -125,38 +125,63 @@ public class EndJob implements Job {
 			inventoryLog.setDescribt("活动-->商品，活动结束还库存，活动剩余="+tempInfo.getGoodsNum().intValue()+",用户多抢="+invalidSeckillTotalCount);
 		}
 		
-		int count = 10;//最多进行10次，10次以后数据丢就丢，老子不管了
 		boolean succLogFlag = false;
 		boolean orderFlag = false;
 		boolean goodsFlag = false;
 		boolean inventoryLogFlag = false;
 		boolean relarionFlag = false;
-//		for(;;) {
-			// 秒杀记录列表存库、订单列表存库
+		for(int count=3;count>0;count--) {
+			// 秒杀记录列表存库
 			if (!succLogFlag) {
-				this.successLogService.addSuccessLogBatch(logEntityList);
-				
-				//
+				try {
+					this.successLogService.addSuccessLogBatch(logEntityList);
+					succLogFlag = true;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
+			// 订单列表存库
 			if (!orderFlag) {
-				this.orderService.addOrderBatch(orderList);
+				try {
+					this.orderService.addOrderBatch(orderList);
+					orderFlag = true;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
+			// 活动订单关联存库
 			if (!relarionFlag) {
-				this.relationService.addBatch(relationList);
+				try {
+					this.relationService.addBatch(relationList);
+					relarionFlag = true;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
+			// 商品还库存
 			if (!goodsFlag) {
-				this.goodsService.update(goods);
+				try {
+					this.goodsService.update(goods);
+					goodsFlag = true;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
+			// 商品库存记录去向
 			if (!inventoryLogFlag) {
-				this.inventoryLogService.add(inventoryLog);
+				try {
+					this.inventoryLogService.add(inventoryLog);
+					inventoryLogFlag = true;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-			if ( (succLogFlag&&orderFlag&&goodsFlag&&inventoryLogFlag) || count <= 0) {
-//				break;
+			if (succLogFlag&&orderFlag&&goodsFlag&&inventoryLogFlag) {
+				break;
 			}
-			count --;
-//		}
+		}
 		
-		// 秒杀生成的订单超时不支付自动取消
+		// 秒杀生成的订单超时不支付自动取消--定时任务启动
 		String name = tempInfo.getActivityId() + "_orderAutoCancel";
 		String group = tempInfo.getActivityGid() + "_orderAutoCancel";
 		Date date = new Date(System.currentTimeMillis() + 1000*tempInfo.getPayDelay());

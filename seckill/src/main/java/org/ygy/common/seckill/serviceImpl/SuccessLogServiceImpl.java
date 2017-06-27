@@ -19,7 +19,7 @@ public class SuccessLogServiceImpl implements SuccessLogService{
 	 */
 	@Override
 	public void addSuccessLogBatch(List<SuccessLogEntity> logEntityList) {
-		if (null != logEntityList && logEntityList.size() > 0) {
+		if (null != logEntityList && !logEntityList.isEmpty()) {
 			this.successLogDao.insertSuccessLogBatch(logEntityList);
 		}
 	}

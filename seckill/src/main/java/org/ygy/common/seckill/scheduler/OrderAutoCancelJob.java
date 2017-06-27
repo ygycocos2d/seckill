@@ -33,23 +33,25 @@ public class OrderAutoCancelJob implements Job{
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
 		System.out.println("自动取消订单:"+new Date(System.currentTimeMillis()));
-//		String jobName = context.getJobDetail().getKey().getName();
-//		String activityId = jobName.substring(0, jobName.indexOf("_"));
-//		for (;;) {
-//			try {
-//				List<String> orderIdList = relationService.getOrderIdListByActivityId(activityId);
-//				if (null != orderIdList && !orderIdList.isEmpty()) {
-//					Map<String, Object> param = new HashMap<String, Object>();
-//					param.put("orderIdList", orderIdList);
-//					param.put("status", Constant.ORDER_STATUS_PAYING);
-//					List<OrderEntity> orderList = orderService.getByOrderIdListAndStatus(param);
-//					orderService.autoCancelOrderList(orderList);
-//				}
-//				break;
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
+		String jobName = context.getJobDetail().getKey().getName();
+		String activityId = jobName.substring(0, jobName.indexOf("_"));
+		for (int count=3;count>0;count--) {
+			try {
+				List<String> orderIdList = relationService.getOrderIdListByActivityId(activityId);
+				if (null != orderIdList && !orderIdList.isEmpty()) {
+					Map<String, Object> param = new HashMap<String, Object>();
+					param.put("orderIdList", orderIdList);
+					param.put("status", Constant.ORDER_STATUS_PAYING);
+					List<OrderEntity> orderList = orderService.getByOrderIdListAndStatus(param);
+					if (null != orderList && !orderList.isEmpty()) {
+						orderService.cancelOrderListAuto(orderList,activityId);
+					}
+				}
+				break;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

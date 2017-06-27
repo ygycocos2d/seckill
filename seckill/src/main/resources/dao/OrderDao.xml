@@ -49,6 +49,15 @@
     </foreach>
   </insert>
   
+  <update id="cancelOrderListAuto" parameterType="java.util.List">
+    update orders
+    set status = '2'
+    where status = '0' and order_id in 
+    <foreach collection="list" item="item" index="index" open="(" close=")" separator="," >   
+        #{item,jdbcType=VARCHAR}
+    </foreach>
+  </update>
+  
   <!--  -->
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 

@@ -26,7 +26,7 @@ public class ActivityServiceImpl implements ActivityService {
 	private GoodsDao goodsDao;
 	
 	@Resource
-	private ActivityGoodsInventoryLogDao nventoryLogDao;
+	private ActivityGoodsInventoryLogDao inventoryLogDao;
 	
 	@Override
 	public ActivityEntity getNotDelActivityById(String id) {
@@ -92,7 +92,7 @@ public class ActivityServiceImpl implements ActivityService {
 		if (null != activity && null != goods && null != inventoryLog) {
 			this.activityDao.updateByPrimaryKeySelective(activity);
 			this.goodsDao.updateByPrimaryKeySelective(goods);
-			this.nventoryLogDao.insertSelective(inventoryLog);
+			this.inventoryLogDao.insertSelective(inventoryLog);
 		}
 	}
 
@@ -102,7 +102,7 @@ public class ActivityServiceImpl implements ActivityService {
 		if (null != activity && null != goods && null != inventoryLog) {
 			this.activityDao.insertSelective(activity);
 			this.goodsDao.updateByPrimaryKeySelective(goods);
-			this.nventoryLogDao.insertSelective(inventoryLog);
+			this.inventoryLogDao.insertSelective(inventoryLog);
 		}
 	}
 

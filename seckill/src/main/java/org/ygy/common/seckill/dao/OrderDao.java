@@ -18,11 +18,11 @@ public interface OrderDao {
 
     int updateByPrimaryKey(OrderEntity record);
 
-	int updateStatusByOrderIdList(Map<String, Object> param);
-
 	OrderEntity selectOrderByIdAndUserId(Map<String, Object> param);
 
 	List<OrderEntity> selectByOrderIdListAndStatus(Map<String, Object> param);
 
 	void insertOrderBatch(List<OrderEntity> orderList);
+
+	int cancelOrderListAuto(List<String> orderIdList);
 }
