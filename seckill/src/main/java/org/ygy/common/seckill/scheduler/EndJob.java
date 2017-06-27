@@ -100,6 +100,7 @@ public class EndJob implements Job {
 			order.setGoodsNumber(validSeckillCount);
 			order.setUserId(en.getKey());
 			order.setStatus("0");//创建状态
+			order.setCreateTime(curDate);
 			orderList.add(order);
 			// 生成秒杀活动与订单的关联记录（其中可用于过期订单自动取消）
 			ActivityOrderRelationEntity relation = new ActivityOrderRelationEntity();
@@ -120,6 +121,7 @@ public class EndJob implements Job {
 			inventoryLog.setActivityId(tempInfo.getActivityId());
 			inventoryLog.setGoodsId(goods.getGoodsId());
 			inventoryLog.setGoodsInventory(toStock);
+			inventoryLog.setCreateTime(new Date());
 			inventoryLog.setDescribt("活动-->商品，活动结束还库存，活动剩余="+tempInfo.getGoodsNum().intValue()+",用户多抢="+invalidSeckillTotalCount);
 		}
 		
