@@ -392,8 +392,9 @@ public class ActivityController {
 							inventoryLog.setGoodsInventory(activity.getGoodsNumber());
 							inventoryLog.setDescribt("活动-->商品");
 							this.activityService.updateActivityAndGoods(activity,goods,inventoryLog);
-						} 
-						this.activityService.update(activity);
+						} else {//暂停-->删除，只是改状态
+							this.activityService.update(activity);
+						}
 					} else {
 						result.put("status", 1);
 						result.put("msg", "该活动已过期或删除");

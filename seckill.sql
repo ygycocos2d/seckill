@@ -3,15 +3,19 @@ Navicat MySQL Data Transfer
 
 Source Server         : localhost
 Source Server Version : 50540
-Source Host           : 127.0.0.1:3306
+Source Host           : localhost:3306
 Source Database       : seckill
 
 Target Server Type    : MYSQL
 Target Server Version : 50540
 File Encoding         : 65001
 
-Date: 2017-06-25 22:42:11
+Date: 2017-06-29 10:04:17
 */
+
+create database seckill;
+
+use seckill;
 
 SET FOREIGN_KEY_CHECKS=0;
 
@@ -37,7 +41,7 @@ CREATE TABLE `activity` (
 -- ----------------------------
 -- Records of activity
 -- ----------------------------
-INSERT INTO `activity` VALUES ('a0397652140c40deacba69cbeabfe973', '52f0fbbc14ab4e45a4fe58b8854ce11a', '2017-06-21 21:54:40', '2017-06-21 21:55:10', '123456789101213141516171819203', '10', '10', '1', '6000', '0', '天下武功唯快不破');
+INSERT INTO `activity` VALUES ('a0397652140c40deacba69cbeabfe973', '52f0fbbc14ab4e45a4fe58b8854ce11a', '2017-06-27 17:48:00', '2017-06-27 17:48:30', '123456789101213141516171819203', '10', '10', '1', '60', '0', '天下武功唯快不破');
 INSERT INTO `activity` VALUES ('e2c9b3ca88ca48948d2d65c126972c47', 'd215349fa060425c8198bbc40f65d597', '2017-06-24 12:59:00', '2017-06-24 11:07:30', '123456789101213141516171819203', '10', '10', '1', '6000', '1', '天下武功唯快不破');
 
 -- ----------------------------
@@ -62,6 +66,7 @@ INSERT INTO `activity_goods_inventory_log` VALUES ('1f192e15a9824a90966148ada48d
 INSERT INTO `activity_goods_inventory_log` VALUES ('201946ebc93d40bf95a70b390c34bb7b', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '8', '活动-->商品，活动结束还库存，活动剩余=8,用户多抢=0', '0000-00-00 00:00:00');
 INSERT INTO `activity_goods_inventory_log` VALUES ('23ee6892f1504b5681662cd191d9bd5d', 'a0397652140c40deacba69cbeabfe973', '123456789101213141516171819203', '10', '活动-->商品，活动结束还库存，活动剩余=10,用户多抢=0', '0000-00-00 00:00:00');
 INSERT INTO `activity_goods_inventory_log` VALUES ('394fc71c0d1142479125d1b4777aec1b', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '10', '活动-->商品，活动结束还库存，活动剩余=10,用户多抢=0', '0000-00-00 00:00:00');
+INSERT INTO `activity_goods_inventory_log` VALUES ('475488d1bda741e89cfc2b8852102930', 'a0397652140c40deacba69cbeabfe973', '123456789101213141516171819203', '9', '活动-->商品，活动结束还库存，活动剩余=9,用户多抢=0', '2017-06-27 17:48:35');
 INSERT INTO `activity_goods_inventory_log` VALUES ('6c3b83f7b07a433e9d86c5fa2daafdf3', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '9', '活动-->商品，活动结束还库存，活动剩余=9,用户多抢=0', '0000-00-00 00:00:00');
 INSERT INTO `activity_goods_inventory_log` VALUES ('816b1bebd22f411895d9a87220e64fbc', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '-10', '商品-->活动', null);
 INSERT INTO `activity_goods_inventory_log` VALUES ('8a0cd9e2adab4e7bb3ce255d51bde0d7', 'e2c9b3ca88ca48948d2d65c126972c47', '123456789101213141516171819203', '10', '活动-->商品', '0000-00-00 00:00:00');
@@ -84,6 +89,7 @@ CREATE TABLE `activity_order_relation` (
 -- ----------------------------
 -- Records of activity_order_relation
 -- ----------------------------
+INSERT INTO `activity_order_relation` VALUES ('a0397652140c40deacba69cbeabfe973', '92657adb76b2472c931b9fc516faa836');
 
 -- ----------------------------
 -- Table structure for `goods`
@@ -100,7 +106,7 @@ CREATE TABLE `goods` (
 -- ----------------------------
 -- Records of goods
 -- ----------------------------
-INSERT INTO `goods` VALUES ('123456789101213141516171819203', 'rio275', '10000', '9');
+INSERT INTO `goods` VALUES ('123456789101213141516171819203', 'rio275', '10000', '18');
 
 -- ----------------------------
 -- Table structure for `img`
@@ -119,10 +125,10 @@ CREATE TABLE `img` (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for `order`
+-- Table structure for `orders`
 -- ----------------------------
-DROP TABLE IF EXISTS `order`;
-CREATE TABLE `order` (
+DROP TABLE IF EXISTS `orders`;
+CREATE TABLE `orders` (
   `order_id` varchar(32) NOT NULL COMMENT '主键ID',
   `user_id` varchar(32) NOT NULL,
   `goods_id` varchar(32) NOT NULL,
@@ -133,8 +139,11 @@ CREATE TABLE `order` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='订单基本信息表';
 
 -- ----------------------------
--- Records of order
+-- Records of orders
 -- ----------------------------
+INSERT INTO `orders` VALUES ('6ec34d00e44045a999060799d48b29ee', '622b3431c58248fa83a35671095552b1', '123456789101213141516171819203', '1', '0', '2017-06-27 17:29:08');
+INSERT INTO `orders` VALUES ('92657adb76b2472c931b9fc516faa836', '622b3431c58248fa83a35671095552b1', '123456789101213141516171819203', '1', '0', '2017-06-27 17:48:33');
+INSERT INTO `orders` VALUES ('de62d7e5f74149d282bc175853d1bb40', '622b3431c58248fa83a35671095552b1', '123456789101213141516171819203', '1', '0', '2017-06-27 17:44:50');
 
 -- ----------------------------
 -- Table structure for `success_log`
@@ -152,8 +161,18 @@ CREATE TABLE `success_log` (
 -- ----------------------------
 -- Records of success_log
 -- ----------------------------
+INSERT INTO `success_log` VALUES ('0413386b3fac496488966a0155829d10', '622b3431c58248fa83a35671095552b1', 'a0397652140c40deacba69cbeabfe973', '1', '2017-06-27 16:41:33');
 INSERT INTO `success_log` VALUES ('08dec41a4508484b84b9a2b63f9caf93', '622b3431c58248fa83a35671095552b1', 'e2c9b3ca88ca48948d2d65c126972c47', '1', '2017-06-21 23:07:38');
+INSERT INTO `success_log` VALUES ('0a86e872973446018b075bf2dde8e413', '622b3431c58248fa83a35671095552b1', 'a0397652140c40deacba69cbeabfe973', '1', '2017-06-27 17:29:08');
 INSERT INTO `success_log` VALUES ('166740ef47fc4342bbae31f1caf63b4a', '622b3431c58248fa83a35671095552b1', 'e2c9b3ca88ca48948d2d65c126972c47', '1', '2017-06-21 23:03:37');
+INSERT INTO `success_log` VALUES ('23a9d6c65057485389bdb19464df622c', '622b3431c58248fa83a35671095552b1', 'a0397652140c40deacba69cbeabfe973', '1', '2017-06-27 16:20:44');
+INSERT INTO `success_log` VALUES ('654993a8961a49b38b78511605feab6d', '622b3431c58248fa83a35671095552b1', 'a0397652140c40deacba69cbeabfe973', '1', '2017-06-27 09:41:59');
+INSERT INTO `success_log` VALUES ('86676bd2a2dd4cd6b5fc99644c9006f7', '622b3431c58248fa83a35671095552b1', 'a0397652140c40deacba69cbeabfe973', '1', '2017-06-27 10:10:45');
+INSERT INTO `success_log` VALUES ('8dd236775f824cb8b5fe25a7063a6d83', '622b3431c58248fa83a35671095552b1', 'a0397652140c40deacba69cbeabfe973', '1', '2017-06-27 16:36:34');
+INSERT INTO `success_log` VALUES ('c6cc2c7579874d5db52a96ded34470ef', '622b3431c58248fa83a35671095552b1', 'a0397652140c40deacba69cbeabfe973', '1', '2017-06-27 17:44:50');
+INSERT INTO `success_log` VALUES ('cc507b08528a4a1aa082595fa2ddc59a', '622b3431c58248fa83a35671095552b1', 'a0397652140c40deacba69cbeabfe973', '1', '2017-06-27 09:57:39');
+INSERT INTO `success_log` VALUES ('f00a91df673f4d2f8753c02ecc95b69b', '622b3431c58248fa83a35671095552b1', 'a0397652140c40deacba69cbeabfe973', '1', '2017-06-27 17:48:33');
+INSERT INTO `success_log` VALUES ('sjdf', 'asdfaj', 'jsdahfk', '10', '0000-00-00 00:00:00');
 
 -- ----------------------------
 -- Table structure for `user`
