@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.ygy.common.seckill.scheduler.SchedulerContext;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -22,6 +24,7 @@ public class RedisUtil {
     private static String maxActive;
     private static String maxWait;
     private static String testOnBorrow;
+    private static String auth;
     
     static {
     	InputStream in = null;
@@ -29,20 +32,23 @@ public class RedisUtil {
     		in = RedisUtil.class.getClassLoader().getResourceAsStream("conf/redis.properties");
     		Properties prop = new Properties();
     		prop.load(in);
-    		startup = prop.getProperty("startup");
-    		if (null != startup && "on".equals(startup.trim())) {
+//    		startup = prop.getProperty("startup");
+//    		if (null != startup && "on".equals(startup.trim())) {
+    		if (SchedulerContext.isCluster()) {//集群才会用到redis
     			maxIdle = prop.getProperty("maxIdle");
     			maxActive = prop.getProperty("maxActive");
     			maxWait = prop.getProperty("maxWait");
     			testOnBorrow = prop.getProperty("testOnBorrow");
     			host = prop.getProperty("host");
     			port = prop.getProperty("port");
+    			auth = prop.getProperty("auth");
     			JedisPoolConfig config = new JedisPoolConfig();   
                 config.setMaxIdle(Integer.parseInt(maxIdle));   
                 config.setMaxTotal(Integer.parseInt(maxActive));   
                 config.setMaxWaitMillis(Long.parseLong(maxWait));   
                 config.setTestOnBorrow("false".endsWith(testOnBorrow)?false:true);  
-                jedisPool = new JedisPool(config, host, Integer.parseInt(port));  
+//                jedisPool = new JedisPool(config, host, Integer.parseInt(port));  
+                jedisPool = new JedisPool(config, host, Integer.parseInt(port), 0, auth);  
     		}
         } catch (Exception e) {
         	e.printStackTrace();
@@ -118,17 +124,66 @@ public class RedisUtil {
     	}
     }
     
-    public static void main(String[] args) {
-    	clearAll();
-    	long start = System.currentTimeMillis();
-    	for (int i=0;i<10000;i++) {
-    		set("key"+i,"val"+i);
+    public static void setHashMap(String key, Map<String, String> map) {
+    	if (null != jedisPool) {
+    		Jedis jedis = jedisPool.getResource();
+    		jedis.hmset(key, map);
+    		jedis.close();
+    	} else {
+    		
     	}
-    	System.out.println(System.currentTimeMillis()-start);
+    }
+    public static Map<String, String> getHashMap(String key) {
+    	Map<String, String> map = new HashMap<String,String>();
+    	if (null != jedisPool) {
+    		Jedis jedis = jedisPool.getResource();
+    		map = jedis.hgetAll(key);
+    		jedis.close();
+    	} else {
+    		
+    	}
+    	return map;
+    }
+    
+    public static void main(String[] args) {
     	
-    	start = System.currentTimeMillis();
-    	System.out.println(getAll().size());
-    	System.out.println(System.currentTimeMillis()-start);
+    	String key = "keepalive";
+    	Map<String, String> map = new HashMap<String, String>();
+    	map.put("1", Long.valueOf(45564654554L).toString());//时间
+    	map.put("2", Long.valueOf(45564654554L).toString());
+    	map.put("3", Long.valueOf(45564654554L).toString());
+    	map.put("4", Long.valueOf(45564654554L).toString());
+    	map.put("5", Long.valueOf(45564654554L).toString());
+    	map.put("6", Long.valueOf(45564654554L).toString());
+    	
+    	setHashMap(key,map);
+    	
+    	System.out.println("------------------------");
+    	
+    	Map<String, String> map1 = getHashMap(key);
+    	
+    	System.out.println(map1);
+    	
+    	
+    	String key2 = "activityId";
+    	Map<String, String> map2 = new HashMap<String, String>();
+    	map2.put("1", Long.valueOf(45564654554L).toString());//商品数量
+    	map2.put("2", Long.valueOf(45564654554L).toString());
+    	map2.put("3", Long.valueOf(45564654554L).toString());
+    	map2.put("4", Long.valueOf(45564654554L).toString());
+    	map2.put("5", Long.valueOf(45564654554L).toString());
+    	map2.put("6", Long.valueOf(45564654554L).toString());
+    	
+//    	clearAll();
+//    	long start = System.currentTimeMillis();
+//    	for (int i=0;i<10000;i++) {
+//    		set("key-11","val-11");
+//    	}
+//    	System.out.println(System.currentTimeMillis()-start);
+//    	
+//    	start = System.currentTimeMillis();
+//    	System.out.println(getAll().size());
+//    	System.out.println(System.currentTimeMillis()-start);
     	
     }
     	
