@@ -28,6 +28,7 @@ import org.ygy.common.seckill.service.GoodsService;
 import org.ygy.common.seckill.service.OrderService;
 import org.ygy.common.seckill.util.AtomicIntegerExt;
 import org.ygy.common.seckill.util.Constant;
+import org.ygy.common.seckill.util.RedisUtil;
 import org.ygy.common.seckill.util.StringUtil;
 
 /**
@@ -58,6 +59,8 @@ public class ActivityController {
 	
 	@Resource
 	private OrderService orderService;
+	
+	
 
 	/**
 	 * 秒杀
@@ -73,13 +76,15 @@ public class ActivityController {
 			UserEntity user = (UserEntity) request.getSession(true).getAttribute("user");
 			String userId = user.getUserId();
 			int num = SchedulerContext.getSucLog().get(userId);
-			ActivityInfo currentTask = SchedulerContext.getCurActivityInfo();
+			ActivityInfo curActivityInfo = SchedulerContext.getCurActivityInfo();
 			// 是否达秒杀上限
-			if (num < currentTask.getNumLimit()) {
-				AtomicIntegerExt goodsNum = currentTask.getGoodsNum();
+			if (num < curActivityInfo.getNumLimit()) {
+				AtomicIntegerExt goodsNum = curActivityInfo.getGoodsNum();
 				// goods没被秒杀完，则秒杀成功，存记录
 				if (goodsNum.getAndDecrementWhenGzero() > 0) {
 					SchedulerContext.getSucLog().set(userId, (num+1));
+					RedisUtil.setHashMapValue(Constant.GOODS_NUMBER+curActivityInfo.getActivityId(), 
+							SchedulerContext.getAppno(), ""+goodsNum.get());
 				} else {
 					// 秒杀完了,秒杀结束
 					result.put("status", 2);

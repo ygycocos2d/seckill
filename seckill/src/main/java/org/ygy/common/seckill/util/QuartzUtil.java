@@ -148,15 +148,16 @@ public class QuartzUtil {
 	 * @param jobClass
 	 * @param name
 	 * @param group
+	 * @param date
 	 * @param intervalInMillis
 	 */
-	public void scheduleAddTokenNumJob(Class<? extends Job> jobClass, String name, String group, long intervalInMillis) {
+	public void add(Class<? extends Job> jobClass, String name, String group, Date date, long intervalInMillis) {
     	try {
     		JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(name, group).build();
         	Trigger trigger = TriggerBuilder.newTrigger()
         			.withIdentity(name, group).withSchedule(SimpleScheduleBuilder.simpleSchedule()
         					.withIntervalInMilliseconds(intervalInMillis)
-        	    	        .repeatForever()).startAt(new Date()).build();  
+        	    	        .repeatForever()).startAt(date).build();  
 			scheduler.scheduleJob(jobDetail, trigger);
 		} catch (SchedulerException e) {
 			e.printStackTrace();
