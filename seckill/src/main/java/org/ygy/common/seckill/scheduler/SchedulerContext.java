@@ -2,11 +2,11 @@ package org.ygy.common.seckill.scheduler;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.quartz.SchedulerException;
-import org.quartz.impl.StdSchedulerFactory;
 import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.successlog.ISuccessLog;
 import org.ygy.common.seckill.util.ActivityQueue;
@@ -84,10 +84,17 @@ public class SchedulerContext {
 					}
 				}
 			} 
-			// 创建Quartz任务调度器，并启动
-			quartzUtil = new QuartzUtil(new StdSchedulerFactory().getScheduler());
-			quartzUtil.start();
-		} catch (SchedulerException e) {
+			
+			// 获取当前应用实例处理指定秒杀活动的商品数，这里只是模拟
+			Properties pro2 = FileUtil.loadMultiProperties("conf/activity_goodsnumber.properties");
+			Iterator<Entry<Object, Object>> it = pro2.entrySet().iterator();  
+	        while (it.hasNext()) {  
+	            Entry<Object, Object> entry = it.next();  
+	            Object key = entry.getKey();  
+	            Object value = entry.getValue(); 
+	            curAppHandleGoodsNum.put(key.toString(), Integer.valueOf(value.toString()));
+	        }
+		} catch (Exception e) {
 			e.printStackTrace();
 		}  
 	}
@@ -137,6 +144,9 @@ public class SchedulerContext {
 	
 	public static ActivityQueue getActivityQueue() {
 		return activityQueue;
+	}
+	public static void setQuartzUtil(QuartzUtil quartzUtil) {
+		SchedulerContext.quartzUtil = quartzUtil;
 	}
 	public static QuartzUtil getQuartzUtil() {
 		return quartzUtil;

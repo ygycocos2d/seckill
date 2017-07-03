@@ -40,10 +40,10 @@ public class StartJob implements Job {
 					List<ImgEntity> imgList = this.imgService.getImgListByActivityId(curActivityInfo.getActivityId());
 					curActivityInfo.setImgList(imgList);
 					// 获取当前秒杀活动在当前应用中处理的秒杀商品数
-//					Integer handlerGoodNumber = SchedulerContext.getCurAppHandleGoodsNum(curActivityInfo.getActivityId());
-//					if (null == handlerGoodNumber || handlerGoodNumber.compareTo(0) < 0) {
-//						handlerGoodNumber = info.g
-//					}
+					Integer handlerGoodNumber = SchedulerContext.getCurAppHandleGoodsNum(curActivityInfo.getActivityId());
+					if (null != handlerGoodNumber && handlerGoodNumber.compareTo(0) > 0) {
+						curActivityInfo.getGoodsNum().set(handlerGoodNumber);
+					}
 					// 调度当前秒杀活动结束任务
 					String name = curActivityInfo.getActivityId() + "_end";
 					String group = curActivityInfo.getActivityGid() + "_end";

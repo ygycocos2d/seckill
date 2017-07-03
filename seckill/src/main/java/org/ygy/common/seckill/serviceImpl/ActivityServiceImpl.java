@@ -47,7 +47,6 @@ public class ActivityServiceImpl implements ActivityService {
 	@Override
 	public boolean updateWhenUnchanged(ActivityEntity entity,
 			int oldLeftGoodsNum) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

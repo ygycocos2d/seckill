@@ -51,13 +51,16 @@ public class KeepAliveJob implements Job{
 
 	@Override
 	public void execute(JobExecutionContext context)throws JobExecutionException {
+		// 往缓存中置值，告诉其他应用实例当前应用实例还活着
+		String aliveKey = Constant.KEEP_ALIVE+SchedulerContext.getAppno();
+		RedisUtil.setEx(aliveKey,"1",SchedulerContext.getDumptime()); 
+		System.out.println("KeepAliveJob---satrt");
 		ActivityInfo info = SchedulerContext.getCurActivityInfo();
 		if (null != info) {
+			System.out.println("KeepAliveJob---activity--satrt");
 			boolean noOk = true;
 			while(noOk) {
-				// 往缓存中置值，告诉其他应用实例当前应用实例还活着
-				String aliveKey = Constant.KEEP_ALIVE+SchedulerContext.getAppno();
-				RedisUtil.setEx(aliveKey,"1",SchedulerContext.getDumptime()); 
+				System.out.println("KeepAliveJob---activity---for---satrt");
 				
 				// 获取当前秒杀活动中所有应用实例处理的商品数:Map<appno,商品数>
 				String goodsNumberKey = Constant.GOODS_NUMBER+info.getActivityId();

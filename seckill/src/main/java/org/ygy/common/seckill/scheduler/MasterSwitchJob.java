@@ -30,7 +30,8 @@ public class MasterSwitchJob implements Job{
 			throws JobExecutionException {
 		System.out.println(new Date(System.currentTimeMillis()));
 		// 获取总开关状态.....
-		boolean masterSwitch = false;
+//		boolean masterSwitch = true;
+		boolean masterSwitch = SchedulerContext.getMasterSwitch();
 		if (masterSwitch) {
 			// 获取有效的秒杀活动
 			List<ActivityEntity> activityList = this.activityService.getAllEffectiveActivity();

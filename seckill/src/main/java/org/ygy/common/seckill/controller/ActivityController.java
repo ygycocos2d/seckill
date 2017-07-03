@@ -139,6 +139,7 @@ public class ActivityController {
 	 */
 	@RequestMapping("updateStatus")
 	@ResponseBody
+	@Deprecated
 	public Map<String,Object> updateStatus(String activityIdList, String status) {
 		Map<String,Object> result = new HashMap<String,Object>();
 		if (SchedulerContext.getMasterSwitch()) {
@@ -215,6 +216,7 @@ public class ActivityController {
 	 */
 	@RequestMapping("setGoodsNumForCurApp")
 	@ResponseBody
+	@Deprecated
 	public Map<String,Object> setGoodsNumForCurApp(String activityId, Integer number) {
 		Map<String,Object> result = new HashMap<String,Object>();
 //		if (SchedulerContext.getMasterSwitch()) {
@@ -265,6 +267,7 @@ public class ActivityController {
 	 */
 	@RequestMapping("startMasterSwitch")
 	@ResponseBody
+	@Deprecated
 	public Map<String,Object> startMasterSwitch() {
 		Map<String,Object> result = new HashMap<String,Object>();
 		if (SchedulerContext.getMasterSwitch()) {
@@ -273,20 +276,21 @@ public class ActivityController {
 			return result;
 		}
 		try {
-			// 状态为已启动且秒杀活动开始时间没过期
-			List<ActivityEntity> activityList = this.activityService.getAllEffectiveActivity();
-			if (null != activityList && !activityList.isEmpty()) {
-				// 将有效的秒杀活动放入优先级队列
-				SchedulerContext.getActivityQueue().addAll(activityList);
-				// 秒杀活动定时调度链启动
-				SchedulerContext.scheduleChainStart();
-				// 记录下总开关状态
-				SchedulerContext.setMasterSwitch(true);
-				result.put("status", 0);
-			} else {
-				result.put("status", 2);
-				result.put("msg", "没有任何有效的秒杀活动");
-			}
+//			// 状态为已启动且秒杀活动开始时间没过期
+//			List<ActivityEntity> activityList = this.activityService.getAllEffectiveActivity();
+//			if (null != activityList && !activityList.isEmpty()) {
+//				// 将有效的秒杀活动放入优先级队列
+//				SchedulerContext.getActivityQueue().addAll(activityList);
+//				// 秒杀活动定时调度链启动
+//				SchedulerContext.scheduleChainStart();
+//				// 记录下总开关状态
+//				SchedulerContext.setMasterSwitch(true);
+//				result.put("status", 0);
+//			} else {
+//				result.put("status", 2);
+//				result.put("msg", "没有任何有效的秒杀活动");
+//			}
+			SchedulerContext.setMasterSwitch(true);
 		} catch (Exception e) {
 			result.put("status", -1);
 			result.put("msg", "系统异常");
@@ -301,6 +305,7 @@ public class ActivityController {
 	 */
 	@RequestMapping("stopMasterSwitch")
 	@ResponseBody
+	@Deprecated
 	public Map<String,Object> stopMasterSwitch() {
 		Map<String,Object> result = new HashMap<String,Object>();
 		if (!SchedulerContext.getMasterSwitch()) {
@@ -326,6 +331,7 @@ public class ActivityController {
 	
 	@RequestMapping("addActivity")
 	@ResponseBody
+	@Deprecated
 	public Map<String,Object> addActivity(@RequestBody ActivityDTO dto) {
 		Map<String,Object> result = this.validateActivity(dto,true);
 		try {
@@ -364,6 +370,7 @@ public class ActivityController {
 	 */
 	@RequestMapping("updateActivity")
 	@ResponseBody
+	@Deprecated
 	public Map<String,Object> updateActivity(@RequestBody ActivityDTO dto) {
 		Map<String,Object> result = this.validateActivity(dto,false);
 		try {
