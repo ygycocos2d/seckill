@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.ygy.common.seckill.util.Constant;
 import org.ygy.common.seckill.util.RedisUtil;
 
 public class ClusterSuccessLog implements ISuccessLog {
@@ -37,6 +38,17 @@ public class ClusterSuccessLog implements ISuccessLog {
 			successLogMap.put(entry.getKey(), Integer.parseInt(entry.getValue()));
 		}
 		return successLogMap;
+	}
+
+	@Override
+	public void hset(String activityId, String userId, int goodsNum) {
+		RedisUtil.setHashMapValue(Constant.SUCC_LOG+activityId, userId, ""+goodsNum);
+	}
+
+	@Override
+	public int hget(String activityId, String userId) {
+		String num = RedisUtil.getHashMapValue(Constant.SUCC_LOG+activityId, userId);
+		return Integer.parseInt(num);
 	}
 
 }

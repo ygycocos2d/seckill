@@ -11,6 +11,8 @@ import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.entity.ImgEntity;
 import org.ygy.common.seckill.service.ImgService;
 import org.ygy.common.seckill.util.AtomicIntegerExt;
+import org.ygy.common.seckill.util.Constant;
+import org.ygy.common.seckill.util.RedisUtil;
 import org.ygy.common.seckill.util.SpringContextUtil;
 
 public class StartJob implements Job {
@@ -44,6 +46,9 @@ public class StartJob implements Job {
 					if (null != handlerGoodNumber && handlerGoodNumber.compareTo(0) > 0) {
 						curActivityInfo.getGoodsNum().set(handlerGoodNumber);
 					}
+					// 讲当前应用实例处理的当前活动秒杀商品数存入缓存
+					RedisUtil.setHashMapValue(Constant.GOODS_NUMBER+curActivityInfo.getActivityId(),
+							SchedulerContext.getAppno(), ""+curActivityInfo.getGoodsNum().get());
 					// 调度当前秒杀活动结束任务
 					String name = curActivityInfo.getActivityId() + "_end";
 					String group = curActivityInfo.getActivityGid() + "_end";

@@ -39,4 +39,16 @@ public class SingleAppSuccessLog implements ISuccessLog {
 	public Map<String, Integer> getAll() {
 		return successLog;
 	}
+
+	@Override
+	public void hset(String activityId, String userId, int goodsNum) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int hget(String activityId, String userId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

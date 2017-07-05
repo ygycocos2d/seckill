@@ -28,4 +28,8 @@ public interface ISuccessLog {
 	 * @return
 	 */
 	Map<String, Integer> getAll();
+	
+	void hset(String activityId, String userId, int goodsNum);
+	
+	int hget(String activityId, String userId);
 }

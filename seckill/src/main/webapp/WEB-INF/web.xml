@@ -11,11 +11,6 @@
     </param-value>
   </context-param>
   
-  <!-- 应用启动监听器  -->
-  <listener>
-    <listener-class>org.ygy.common.seckill.listener.ApplicationContextListener</listener-class>
-  </listener>
-  
   <!-- 编码过滤器  -->
   <filter>
     <filter-name>encodingFilter</filter-name>
@@ -106,6 +101,13 @@
     <servlet-name>SpringMVC</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
+  
+  <!-- 应用启动监听器,因为需要引用spring容器中的bean所以要后一点启动  -->
+  <listener>
+    <listener-class>org.ygy.common.seckill.listener.ApplicationContextListener</listener-class>
+  </listener>
+  
+  
   <welcome-file-list>
     <welcome-file>/index.jsp</welcome-file>
   </welcome-file-list>

@@ -60,8 +60,6 @@ public class ActivityController {
 	@Resource
 	private OrderService orderService;
 	
-	
-
 	/**
 	 * 秒杀
 	 * @param request
@@ -75,14 +73,16 @@ public class ActivityController {
 		try {
 			UserEntity user = (UserEntity) request.getSession(true).getAttribute("user");
 			String userId = user.getUserId();
-			int num = SchedulerContext.getSucLog().get(userId);
 			ActivityInfo curActivityInfo = SchedulerContext.getCurActivityInfo();
+			int num = SchedulerContext.getSucLog().hget(curActivityInfo.getActivityId(),userId);
 			// 是否达秒杀上限
 			if (num < curActivityInfo.getNumLimit()) {
 				AtomicIntegerExt goodsNum = curActivityInfo.getGoodsNum();
 				// goods没被秒杀完，则秒杀成功，存记录
 				if (goodsNum.getAndDecrementWhenGzero() > 0) {
-					SchedulerContext.getSucLog().set(userId, (num+1));
+					SchedulerContext.getSucLog().hset(curActivityInfo.getActivityId(),
+							userId, (num+1));
+					// 我在想有没有必要启动线程来处理这步操作
 					RedisUtil.setHashMapValue(Constant.GOODS_NUMBER+curActivityInfo.getActivityId(), 
 							SchedulerContext.getAppno(), ""+goodsNum.get());
 				} else {

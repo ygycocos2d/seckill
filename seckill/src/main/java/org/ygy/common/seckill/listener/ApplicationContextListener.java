@@ -7,6 +7,7 @@ import javax.servlet.ServletContextListener;
 
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
+import org.ygy.common.seckill.scheduler.DealedHandlerJob;
 import org.ygy.common.seckill.scheduler.KeepAliveJob;
 import org.ygy.common.seckill.scheduler.MasterSwitchJob;
 import org.ygy.common.seckill.scheduler.SchedulerContext;
@@ -26,6 +27,9 @@ public class ApplicationContextListener implements ServletContextListener {
 			// 启动集群中应用实例相互检测job
 			SchedulerContext.getQuartzUtil().add(KeepAliveJob.class, "keepAliveJobId",
 					"keepAliveJobIdGid", new Date(), 1000*SchedulerContext.getHeartbeat());
+			SchedulerContext.getQuartzUtil().add(DealedHandlerJob.class, "dealedHandlerJobId",
+					"dealedHandlerJobGid", new Date(), 1000*SchedulerContext.getHeartbeat());
+			
 			// 检测总开关是否开启job。(应该做成消息处理的形式--现在用循化定时任务模拟)
 			SchedulerContext.getQuartzUtil().add(MasterSwitchJob.class, "masterSwitchJobId",
 					"masterSwitchJobGid", new Date());
