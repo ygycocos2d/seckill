@@ -74,13 +74,13 @@ public class ActivityController {
 			UserEntity user = (UserEntity) request.getSession(true).getAttribute("user");
 			String userId = user.getUserId();
 			ActivityInfo curActivityInfo = SchedulerContext.getCurActivityInfo();
-			int num = SchedulerContext.getSucLog().hget(curActivityInfo.getActivityId(),userId);
+			int num = SchedulerContext.getSucLog().getGoodsNumberOfUserInActivity(curActivityInfo.getActivityId(),userId);
 			// 是否达秒杀上限
 			if (num < curActivityInfo.getNumLimit()) {
 				AtomicIntegerExt goodsNum = curActivityInfo.getGoodsNum();
 				// goods没被秒杀完，则秒杀成功，存记录
 				if (goodsNum.getAndDecrementWhenGzero() > 0) {
-					SchedulerContext.getSucLog().hset(curActivityInfo.getActivityId(),
+					SchedulerContext.getSucLog().setGoodsNumerOfUserInActivity(curActivityInfo.getActivityId(),
 							userId, (num+1));
 					// 我在想有没有必要启动线程来处理这步操作
 					RedisUtil.setHashMapValue(Constant.GOODS_NUMBER+curActivityInfo.getActivityId(), 

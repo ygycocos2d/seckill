@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.ygy.common.seckill.util.Constant;
 import org.ygy.common.seckill.util.RedisUtil;
+import org.ygy.common.seckill.util.StringUtil;
 
 public class ClusterSuccessLog implements ISuccessLog {
 
@@ -41,14 +42,27 @@ public class ClusterSuccessLog implements ISuccessLog {
 	}
 
 	@Override
-	public void hset(String activityId, String userId, int goodsNum) {
+	public void setGoodsNumerOfUserInActivity(String activityId, String userId, int goodsNum) {
 		RedisUtil.setHashMapValue(Constant.SUCC_LOG+activityId, userId, ""+goodsNum);
 	}
 
 	@Override
-	public int hget(String activityId, String userId) {
+	public int getGoodsNumberOfUserInActivity(String activityId, String userId) {
 		String num = RedisUtil.getHashMapValue(Constant.SUCC_LOG+activityId, userId);
+		if (StringUtil.isEmpty(num)) {
+			return 0;
+		}
 		return Integer.parseInt(num);
+	}
+
+	@Override
+	public Map<String, Integer> getSuccLogInActivity(String activityId) {
+		Map<String, Integer> succLog = new HashMap<String, Integer>();
+		Set<Entry<String, String>> set = RedisUtil.getHashMap(Constant.SUCC_LOG+activityId).entrySet();
+		for (Entry<String, String> en:set) {
+			succLog.put(en.getKey(), Integer.parseInt(en.getValue()));
+		}
+		return succLog;
 	}
 
 }

@@ -75,11 +75,12 @@ public class DealedHandlerJob implements Job{
 			    	if (keys.length > 0) {
 			    		List<String> appNoStatus = RedisUtil.getByKeys(keys);
 			    		for (int i=0;i<appNoStatus.size();i++) {
+			    			String key = keys[i].substring( (keys[i].indexOf("_")+1) );
 				    		if (null != appNoStatus.get(i)) {
-				    			aliveMap.put(keys[i], true);
+				    			aliveMap.put(key, true);
 				    			aliveNum ++;
 				    		} else {
-				    			aliveMap.put(keys[i], false);
+				    			aliveMap.put(key, false);
 				    		}
 				    	}
 			    	}

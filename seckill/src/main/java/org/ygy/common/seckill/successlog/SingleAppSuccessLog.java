@@ -41,14 +41,20 @@ public class SingleAppSuccessLog implements ISuccessLog {
 	}
 
 	@Override
-	public void hset(String activityId, String userId, int goodsNum) {
+	public void setGoodsNumerOfUserInActivity(String activityId, String userId, int goodsNum) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public int hget(String activityId, String userId) {
+	public int getGoodsNumberOfUserInActivity(String activityId, String userId) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public Map<String, Integer> getSuccLogInActivity(String activityId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

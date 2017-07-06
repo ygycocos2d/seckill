@@ -29,7 +29,9 @@ public interface ISuccessLog {
 	 */
 	Map<String, Integer> getAll();
 	
-	void hset(String activityId, String userId, int goodsNum);
+	void setGoodsNumerOfUserInActivity(String activityId, String userId, int goodsNum);
 	
-	int hget(String activityId, String userId);
+	int getGoodsNumberOfUserInActivity(String activityId, String userId);
+	
+	Map<String, Integer> getSuccLogInActivity(String activityId);
 }

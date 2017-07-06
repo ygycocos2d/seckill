@@ -67,8 +67,9 @@ public class EndJob implements Job {
 		 *  进行当前秒杀活动结束后的一些操作（tempInfo），统计实际抢了多少，有多少被多抢了，生成订单、还库存等
 		 */
 		// 该次秒杀活动秒杀记录获取后，清除缓存，以备下一个秒杀活动使用
-		Map<String, Integer> killSucLog = SchedulerContext.getSucLog().getAll();
-		SchedulerContext.getSucLog().clearAll();
+//		Map<String, Integer> killSucLog = SchedulerContext.getSucLog().getAll();
+//		SchedulerContext.getSucLog().clearAll();
+		Map<String, Integer> killSucLog = SchedulerContext.getSucLog().getSuccLogInActivity(tempInfo.getActivityId());
 		// 构建秒杀成功记录list
 		List<SuccessLogEntity> logEntityList = new ArrayList<SuccessLogEntity>();
 		List<OrderEntity> orderList = new ArrayList<OrderEntity>();//订单

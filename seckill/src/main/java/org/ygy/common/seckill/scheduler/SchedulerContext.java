@@ -65,7 +65,7 @@ public class SchedulerContext {
 					appno = StringUtil.getUUID();
 				}
 				SchedulerContext.setAppno(appno);
-				if (StringUtil.isEmpty(heartbeat)) {
+				if (!StringUtil.isEmpty(heartbeat)) {
 					int  heartbeatInt = 0;
 					try {
 						heartbeatInt = Integer.parseInt(heartbeat);
@@ -74,11 +74,11 @@ public class SchedulerContext {
 						e.printStackTrace();
 					}
 				}
-				if (StringUtil.isEmpty(dumptime)) {
+				if (!StringUtil.isEmpty(dumptime)) {
 					int dumptimeInt = 0;
 					try {
 						dumptimeInt = Integer.parseInt(dumptime);
-						SchedulerContext.setHeartbeat(dumptimeInt);
+						SchedulerContext.setDumptime(dumptimeInt);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
