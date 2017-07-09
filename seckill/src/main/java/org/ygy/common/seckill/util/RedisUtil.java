@@ -240,7 +240,46 @@ public class RedisUtil {
     		
     	}
     }
+    
+    
+    
+    public static String getAndSet(String key, String newValue) {
+    	String oldValue = null;
+    	if (null != jedisPool) {
+    		Jedis jedis = jedisPool.getResource();
+    		oldValue = jedis.getSet(key, newValue);
+    		jedis.close();
+    	} else {
+    		
+    	}
+    	return oldValue;
+    }
+    
+    public static void incr(String key) {
+    	if (null != jedisPool) {
+    		Jedis jedis = jedisPool.getResource();
+    		jedis.incr(key);
+    		jedis.close();
+    	} else {
+    		
+    	}
+    }
+    public static void decr(String key) {
+    	if (null != jedisPool) {
+    		Jedis jedis = jedisPool.getResource();
+    		jedis.decr(key);
+    		jedis.close();
+    	} else {
+    		
+    	}
+    }
+    
     public static void main(String[] args) {
+    	
+    	getAndSet("","");
+//    	String handled = RedisUtil.getHashMapValue(Constant.SUCC_HANDLED_FLAG, "55446");
+//    	
+//    	System.out.println(handled);
 //    	Date date = new Date();
 //    	SchedulerContext.getQuartzUtil().add(KeepAliveJob.class,
 //    			"jsjdfhjsk", "jkafhja", date, 1*1000);

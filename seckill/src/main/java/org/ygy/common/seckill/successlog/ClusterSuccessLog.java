@@ -43,12 +43,12 @@ public class ClusterSuccessLog implements ISuccessLog {
 
 	@Override
 	public void setGoodsNumerOfUserInActivity(String activityId, String userId, int goodsNum) {
-		RedisUtil.setHashMapValue(Constant.SUCC_LOG+activityId, userId, ""+goodsNum);
+		RedisUtil.setHashMapValue(Constant.Cache.SUCC_LOG+activityId, userId, ""+goodsNum);
 	}
 
 	@Override
 	public int getGoodsNumberOfUserInActivity(String activityId, String userId) {
-		String num = RedisUtil.getHashMapValue(Constant.SUCC_LOG+activityId, userId);
+		String num = RedisUtil.getHashMapValue(Constant.Cache.SUCC_LOG+activityId, userId);
 		if (StringUtil.isEmpty(num)) {
 			return 0;
 		}
@@ -58,11 +58,29 @@ public class ClusterSuccessLog implements ISuccessLog {
 	@Override
 	public Map<String, Integer> getSuccLogInActivity(String activityId) {
 		Map<String, Integer> succLog = new HashMap<String, Integer>();
-		Set<Entry<String, String>> set = RedisUtil.getHashMap(Constant.SUCC_LOG+activityId).entrySet();
+		Set<Entry<String, String>> set = RedisUtil.getHashMap(Constant.Cache.SUCC_LOG+activityId).entrySet();
 		for (Entry<String, String> en:set) {
 			succLog.put(en.getKey(), Integer.parseInt(en.getValue()));
 		}
 		return succLog;
 	}
+
+	@Override
+	public boolean getHandledFlagFromActivitySuccLog(String activityId) {
+		String handled = RedisUtil.getAndSet(Constant.Cache.SUCC_HANDLED_FLAG+activityId, Constant.Cache.HANDLING);
+		if (Constant.Cache.HANDLED.equals(handled)) {//旧值为已处理，重设为已处理
+			RedisUtil.set(Constant.Cache.SUCC_HANDLED_FLAG+activityId, Constant.Cache.HANDLED);
+			return true;
+		}
+		if (Constant.Cache.HANDLING.equals(handled)) {//旧值为处理中，说明正在被其他实例处理
+			return true;
+		}
+		return false;
+	}
+
+//	@Override
+//	public void setHandledFlagForActivitySuccLog(String activityId) {
+//		RedisUtil.setHashMapValue(Constant.SUCC_HANDLED_FLAG, activityId, "1");
+//	}
 
 }

@@ -47,7 +47,7 @@ public class StartJob implements Job {
 						curActivityInfo.getGoodsNum().set(handlerGoodNumber);
 					}
 					// 讲当前应用实例处理的当前活动秒杀商品数存入缓存
-					RedisUtil.setHashMapValue(Constant.GOODS_NUMBER+curActivityInfo.getActivityId(),
+					RedisUtil.setHashMapValue(Constant.Cache.GOODS_NUMBER+curActivityInfo.getActivityId(),
 							SchedulerContext.getAppno(), ""+curActivityInfo.getGoodsNum().get());
 					// 调度当前秒杀活动结束任务
 					String name = curActivityInfo.getActivityId() + "_end";
@@ -57,7 +57,6 @@ public class StartJob implements Job {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
 			}
 		}
 	}

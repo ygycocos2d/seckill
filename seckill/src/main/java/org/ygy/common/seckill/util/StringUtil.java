@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.ygy.common.seckill.scheduler.SchedulerContext;
+
 public class StringUtil {
 	
 	public static boolean isEmpty(String str) {
@@ -15,6 +17,10 @@ public class StringUtil {
 
 	public static String getUUID() {
 		return UUID.randomUUID().toString().replaceAll("-", "");
+	}
+	
+	public static String getClusterUUID() {
+		return SchedulerContext.getAppno()+UUID.randomUUID().toString().replaceAll("-", "");
 	}
 	
 	/**
@@ -37,8 +43,9 @@ public class StringUtil {
 	
 	public static void main(String[] args) {
 		System.out.println(getUUID());
+		System.out.println(getClusterUUID());
 //		String[] stringArray = {"a","b"};
 //		System.out.println(contains(null,null));
-		
+		System.out.println("1".equals(null));
 	}
 }

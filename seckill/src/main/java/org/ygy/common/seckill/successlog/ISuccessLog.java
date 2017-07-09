@@ -34,4 +34,8 @@ public interface ISuccessLog {
 	int getGoodsNumberOfUserInActivity(String activityId, String userId);
 	
 	Map<String, Integer> getSuccLogInActivity(String activityId);
+	
+	boolean getHandledFlagFromActivitySuccLog(String activityId);
+	
+//	void setHandledFlagForActivitySuccLog(String activityId);
 }

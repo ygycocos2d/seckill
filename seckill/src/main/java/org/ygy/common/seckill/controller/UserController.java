@@ -103,4 +103,17 @@ public class UserController {
 		}
 		return result;
 	}
+	
+	@RequestMapping("testRegist")
+	@ResponseBody
+	public Map<String,Object> testRegist() {
+		Map<String,Object> result = new HashMap<String,Object>();
+		for(int i=0;i<100;i++) {
+			UserEntity user = new UserEntity();
+			user.setUserAccount("ygy"+i);
+			user.setUserPwd("123456");
+			regist(user);
+		}
+		return result;
+	}
 }

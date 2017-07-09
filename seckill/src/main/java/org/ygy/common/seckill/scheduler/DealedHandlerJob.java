@@ -61,13 +61,13 @@ public class DealedHandlerJob implements Job{
 					System.out.println("KeepAliveJob---activity---for---satrt");
 					
 					// 获取当前秒杀活动中所有应用实例处理的商品数:Map<appno,商品数>
-					String goodsNumberKey = Constant.GOODS_NUMBER+info.getActivityId();
+					String goodsNumberKey = Constant.Cache.GOODS_NUMBER+info.getActivityId();
 					Map<String, String> goodsNumberMap = RedisUtil.getHashMap(goodsNumberKey);
 					
 					// 获取所有应用实例是否活着
 			    	List<String> keyList = new ArrayList<String>();
 			    	for(Entry<String, String> en : goodsNumberMap.entrySet()) {
-			    		keyList.add(Constant.KEEP_ALIVE + en.getKey());
+			    		keyList.add(Constant.Cache.KEEP_ALIVE + en.getKey());
 			    	}
 			    	String[] keys = keyList.toArray(new String[keyList.size()]);
 			    	Map<String, Boolean> aliveMap = new HashMap<String, Boolean>();//Map<appno,是否活着>
@@ -95,7 +95,7 @@ public class DealedHandlerJob implements Job{
 			    					noOk = false;
 			    					continue;
 			    				}
-			    				String comedKey = Constant.COMED+info.getActivityId()+"_"+en.getKey();
+			    				String comedKey = Constant.Cache.COMED+info.getActivityId()+"_"+en.getKey();
 			    				Set<String> set = RedisUtil.smembers(comedKey);
 			    				int num = 0;
 			    				// 商品数非0但所有活着的应用实例都平分过该宕机实例的商品数了，说明又有应用挂了
@@ -112,6 +112,7 @@ public class DealedHandlerJob implements Job{
 				    					num = goodsNumer/(aliveNum-set.size());
 				    				}
 			    				}
+			    				
 			    				// 更新宕机应用实例商品数及被平分记录、当前应用实例商品数
 			    				int oldGoodsNumber = Integer.valueOf(RedisUtil.getHashMapValue(goodsNumberKey, en.getKey()));
 			    				if (oldGoodsNumber != goodsNumer) {//避免宕机实例的商品数不一致（其实还是有可能出现不一致，这里只是尽量减少）

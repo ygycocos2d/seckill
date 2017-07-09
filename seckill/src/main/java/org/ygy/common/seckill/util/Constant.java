@@ -14,9 +14,21 @@ public class Constant {
 	public static final String ORDER_STATUS_EXPIRE = "2";//已过期
 	public static final String[] ORDER_STATUS = {"0","1","2"};
 	
-	// 缓存key前缀
-	public static final String KEEP_ALIVE = "keepAlive_";
-	public static final String GOODS_NUMBER = "goodsNumber_";
-	public static final String SUCC_LOG = "succLog_";
-	public static final String COMED = "comed_";
+	public static interface Cache{
+		// 缓存key前缀
+		final String KEEP_ALIVE = "keepAlive_";
+		final String GOODS_NUMBER = "goodsNumber_";
+		final String SUCC_LOG = "succLog_";
+		final String SUCC_HANDLED_FLAG = "succHandled_";
+		final String COMED = "comed_";
+		
+		/**
+		 *  秒杀succLog处理状态flag
+		 *  1、保证只有一个应用实例处理succLog
+		 *  2、当处理succLog的实例出现异常时（如宕机），可根据这些状态进行后续的人工处理（可以是一个管理应用）
+		 */
+		final String UNHANDLE = null;//未处理
+		final String HANDLING = "1";//处理中
+		final String HANDLED = "2";//已处理
+	}
 }

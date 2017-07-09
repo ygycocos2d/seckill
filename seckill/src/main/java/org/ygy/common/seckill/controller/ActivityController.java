@@ -83,7 +83,7 @@ public class ActivityController {
 					SchedulerContext.getSucLog().setGoodsNumerOfUserInActivity(curActivityInfo.getActivityId(),
 							userId, (num+1));
 					// 我在想有没有必要启动线程来处理这步操作
-					RedisUtil.setHashMapValue(Constant.GOODS_NUMBER+curActivityInfo.getActivityId(), 
+					RedisUtil.setHashMapValue(Constant.Cache.GOODS_NUMBER+curActivityInfo.getActivityId(), 
 							SchedulerContext.getAppno(), ""+goodsNum.get());
 				} else {
 					// 秒杀完了,秒杀结束
