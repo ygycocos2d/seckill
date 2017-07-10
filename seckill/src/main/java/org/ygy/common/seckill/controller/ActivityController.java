@@ -88,14 +88,17 @@ public class ActivityController {
 				} else {
 					// 秒杀完了,秒杀结束
 					result.put("status", 2);
+					result.put("msg", "秒杀完了！");
 				}
 			} else {
 				// 秒杀已达数量上限
 				result.put("status", 1);
+				result.put("msg", "秒杀已达数量上限！");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			result.put("status", -1);
+			result.put("msg", "系统异常");
 		}
 		return result;
 	}
@@ -127,6 +130,7 @@ public class ActivityController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			result.put("status", -1);
+			result.put("msg", "系统异常");
 		}
 		return result;
 	}
