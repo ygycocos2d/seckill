@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class UserEntity implements Serializable{
     /**
-	 * 
+	 * 要序列化，redis  session共享
 	 */
 	private static final long serialVersionUID = 7572809110241194602L;
 

@@ -8,6 +8,8 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.service.ActivityService;
+import org.ygy.common.seckill.service.SwitchService;
+import org.ygy.common.seckill.util.Constant;
 import org.ygy.common.seckill.util.SpringContextUtil;
 import org.ygy.common.seckill.util.StringUtil;
 
@@ -16,10 +18,12 @@ public class MasterSwitchJob implements Job{
 	private static String GID = "masterSwitch";
 	
 	private ActivityService activityService;
+	private SwitchService switchService;
 	
 	public MasterSwitchJob() {
 		try {
 			activityService = (ActivityService) SpringContextUtil.getBeanByClass(ActivityService.class);
+			switchService = (SwitchService) SpringContextUtil.getBeanByClass(SwitchService.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -30,11 +34,9 @@ public class MasterSwitchJob implements Job{
 			throws JobExecutionException {
 		System.out.println(new Date(System.currentTimeMillis()));
 		try {
-			// 获取总开关状态.....
-//			boolean masterSwitch = true;
-//			boolean masterSwitch = SchedulerContext.getMasterSwitch();
-//			if (masterSwitch) {
-			if (true) {
+			// 获取总开关状态
+			String status = switchService.getStatusByType(Constant.SECKILL_SWITCH);
+			if ("1".equals(status)) {
 				// 获取有效的秒杀活动
 				List<ActivityEntity> activityList = this.activityService.getAllEffectiveActivity();
 				if (null != activityList && !activityList.isEmpty()) {

@@ -26,9 +26,15 @@ public class GoodsController {
 		if (StringUtil.isEmpty(goodsId)) {
 			result.put("msg", "参数不合法");
 		} else {
-			GoodsEntity goods = this.goodsService.getGoodsById(goodsId);
-			result.put("status", 0);
-			result.put("data", goods);
+			try {
+				GoodsEntity goods = this.goodsService.getGoodsById(goodsId);
+				result.put("status", 0);
+				result.put("data", goods);
+			} catch (Exception e) {
+				e.printStackTrace();
+				result.put("status", -1);
+				result.put("msg", "系统异常");
+			}
 		}
 		return result;
 	}

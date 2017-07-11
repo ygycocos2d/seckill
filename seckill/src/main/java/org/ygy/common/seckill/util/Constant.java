@@ -31,4 +31,7 @@ public class Constant {
 		final String HANDLING = "1";//处理中
 		final String HANDLED = "2";//已处理
 	}
+	
+	//总开关类型
+	public static final String SECKILL_SWITCH = "1";
 }

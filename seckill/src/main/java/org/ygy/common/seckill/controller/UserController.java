@@ -10,8 +10,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.ygy.common.seckill.dao.SwitchDao;
+import org.ygy.common.seckill.entity.SwitchEntity;
 import org.ygy.common.seckill.entity.UserEntity;
 import org.ygy.common.seckill.service.UserService;
+import org.ygy.common.seckill.util.Constant;
 import org.ygy.common.seckill.util.StringUtil;
 
 @Controller
@@ -20,6 +23,9 @@ public class UserController {
 	
 	@Resource
 	private UserService userService;
+	
+	@Resource
+	private SwitchDao switchDao;
 
 	/**
 	 * 用户登录，增session
@@ -114,6 +120,16 @@ public class UserController {
 			user.setUserPwd("123456");
 			regist(user);
 		}
+		return result;
+	}
+	
+	@RequestMapping("getSwitch")
+	@ResponseBody
+	public Map<String,Object> getSwitch(String id) {
+		Map<String,Object> result = new HashMap<String,Object>();
+//		SwitchEntity en = switchDao.selectByPrimaryKey(id);
+		SwitchEntity en = switchDao.selectByType(Constant.SECKILL_SWITCH);
+		result.put("status", en.getStatus());
 		return result;
 	}
 }
