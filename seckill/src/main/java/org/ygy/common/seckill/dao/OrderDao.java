@@ -25,4 +25,7 @@ public interface OrderDao {
 	void insertOrderBatch(List<OrderEntity> orderList);
 
 	int cancelOrderListAuto(List<String> orderIdList);
+
+	List<OrderEntity> selectOrderListByUserIdAndStatus(
+			Map<String, Object> params);
 }

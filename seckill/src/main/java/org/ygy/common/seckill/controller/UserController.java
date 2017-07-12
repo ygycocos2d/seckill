@@ -94,7 +94,7 @@ public class UserController {
 			try {
 				UserEntity en = userService.getByAccount(user.getUserAccount());
 				if (en == null) {
-					user.setUserId(StringUtil.getUUID());
+					user.setUserId(StringUtil.getClusterUUID());
 					this.userService.add(user);
 					result.put("status", 0);
 				} else {

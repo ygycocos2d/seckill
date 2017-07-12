@@ -1,247 +1,70 @@
-
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>运营平台</title>
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="renderer" content="webkit">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <link href="http://cdn.bootcss.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="//cdn.bootcss.com/tether/1.1.1/css/tether.css" rel="stylesheet">
-    <link href="http://cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
-    <link href="http://cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.css" rel="stylesheet">
-    <style>
-      body{
-        font:14px "微软雅黑";
-        background-color: rgba(255, 255, 255, 0.3);
-      }
-      html{
-        background:#f0f0f0;
-        background-size: cover;
-        font-family: "微软雅黑";
-      }
-
-      input:-webkit-autofill {
-       -webkit-box-shadow: 0 0 0px 1000px rgb(248, 248, 248) inset;
-       -webkit-text-fill-color: #333;
-      }
-
-      .dl-login-h {
-        background: #fff;
-        height: 60px;
-        line-height: 60px;
-        border-bottom: 1px solid #e9e9e9;
-      }
-      .dl-login-h a {
-        display: inline-block;
-        margin-left: 103px;
-      }
-
-      .dl-login-module {
-        /*box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);*/
-        /*background-color: #fff;*/
-        height: 454px;
-        /*width: 1000px;*/
-        margin: 150px auto;
-      }
-
-      .dl-login-module .module-left {
-        background: url(/public/images/loginimg.gif) no-repeat;
-        height: 454px;
-        width: 588px;
-        float: left;
-      }
-
-      .dl-login-module .module-right {
-        /*width: 411px;*/
-        /*float: right;*/
-      }
-      .dl-login-form {
-        width: 275px;
-        padding-top: 130px;
-        margin: 0 auto;
-      }
-
-      .dl-login-form input {
-        border: none;
-        border-bottom: solid 1px #b9baba;
-        outline: none;
-        text-indent: 1em;
-        height: 35px;
-        width: 100%;
-        background: rgba(255, 255, 255, 0.5);
-        display: block;
-        margin-bottom: 10px;
-        -webkit-transition: all .5s ease;
-        transition: all .5s ease;
-      }
-      
-      .dl-login-form input:hover {
-        border-color: #009edb;
-      }
-
-      .dl-login-form input:focus {
-        border-color: #009edb;
-      }
-      .dl-login-btn {
-        /*position: relative;*/
-        /*top: 0;*/
-        border: none;
-        border-radius: 6px;
-        color: #fff;
-        width: 100%;
-        line-height: 35px;
-        background-color: #009edb;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
-        -webkit-transition: all .5s ease;
-        transition: all .5s ease;
-      }
-      
-      .dl-login-btn:hover {
-        background-color: #19a8df;
-        
-        box-shadow: 0 0 10px rgba(0, 158, 219, .4);
-        /*position: relative;*/
-        top:-1px;
-        z-index: 10;
-        /*border-color: transparent;*/
-        /*background: rgb(255, 255, 255);*/
-      }
-
-      .dl-login-btn:focus {
-        outline: none;
-        background-color: #0096d0;
-      }
-
-      .dl-login-btn:active {
-        outline: none;
-        background-color: #0096d0;
-      }
-      
-      .dl-error-msg {
-        text-indent: 1em;
-        font-size: 12px;
-        color: #e50043;
-        opacity: 0;
-        -webkit-transition: all .3s cubic-bezier(.645,.045,.355,1);
-        transition: all .3s cubic-bezier(.645,.045,.355,1);
-      }
-
-      .dl-error-msg.show {
-        opacity: 1;
-      }
-
-      .loginPanel{
-        background-color: rgba(255, 255, 255, 0.3);
-        border: none;
-        width: 300px;
-        position: fixed;
-        right: 30%;
-        bottom: 20%;
-      }
-      .submit{
-        height: 40px;
-        width: 100%;
-        font-weight: bold;
-        font-size: 20px;
-        color: #888;
-      }
-      footer {
-        padding: 15px 0 15px 0;
-      }
-
-      footer p {
-        font-size: 12px;
-        color: #444;
-        text-align: center;
-      }
-
-      footer p a {
-        color: #444;
-        text-decoration: none;
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-      .bg {
-        z-index: -1;
-        position: absolute;
-        top: -300px;
-        left: -20%;
-        right: 30%;
-        bottom: 0;
-        border-radius: 500% 0% 500% 0;
-        box-shadow: -7px 0px 10px rgba(180, 180, 180, 0.18) inset;
-      }
-      .title {
-        width: 50px;
-        margin: 0 auto;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="bg"></div>
-    <div id="wrapper">
-    <div class="dl-login-outside">
-      <div class="dl-login-module">
-        <div class="module-right">
-          <div class="dl-login-form">
-            <img src="/public/images/logo.png" alt="logo" style="display:block;margin:0 auto 10px auto">
-            <form action="" method="post">
-              <input type="text" class="" name="username" placeholder="用户名">
-              <input type="password" class="" name="password" placeholder="密码">
-              <p id="errorMsg" class="dl-error-msg ">这里显示错误信息!</p>
-              <button type="submit" class="dl-login-btn animated">登录运营平台</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-    <footer>
-      <p>Copyright©2000-2014 丹露有限公司 All Rights Reserved</p>
-      <p>网站备案/许可证号: <a href="http://sccainfo.miitbeian.gov.cn/state/outPortal/loginPortal.action">ICP备09096283号</a></p>
-    </footer>
-  </div>
-  
-    <script src="//cdn.bootcss.com/jquery/2.1.0/jquery.min.js"></script>
-    <script src="//cdn.bootcss.com/tether/1.1.1/js/tether.min.js"></script>
-    <script src="//cdn.bootcss.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js"></script>
-    <script src="/public/md5.js"></script>
-
-    <script>
-      $(function(){
-        $('form').submit(function(){
-          var username = $('input[name="username"').val();
-          var password = $('input[name="password"').val();
-          //运营平台使用人员限制
-          var whiteList = {'dlfrontend':true,'Hexiaomei':true,'zhanshibo':true,"liuyisha":true,"leiyu_g":true,"wangfalin":true,"hehaiyan":true,"yuezhaoke":true,"zhaosiyi":true};
-        //  if(whiteList[username]){
-            $.post("/login",{
-              username: username.trim(),
-              password: md5(password.trim())
-            }, function(res){
-              if(!res.status){
-                window.location.href = "/";
-              }else {
-                return showErrorMsg(res.msg);
-              }
-            })
-      //    }else {
-         //   showErrorMsg('此账号无权限登录！');
-        //  }
-          return false;
-        });
-        function showErrorMsg(msg) {
-          $(".dl-login-btn").addClass('animated shake');
-          $("#errorMsg").text(msg).addClass('show');
-          setTimeout(function() {
-            $("#errorMsg").removeClass('show');
-            $(".dl-login-btn").removeClass('shake');
-          },3000);
-        }
-      });
-    </script>
-  </body>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>秒杀登录</title>
+  <link rel="stylesheet" type="text/css" href="http://unpkg.com/iview/dist/styles/iview.css">
+  <script type="text/javascript" src="http://vuejs.org/js/vue.min.js"></script>
+  <script type="text/javascript" src="http://unpkg.com/iview/dist/iview.min.js"></script>
+  <style type="text/css">
+  	#app{
+  		width: 212px;
+  		height: 346px;
+  		margin: 300px auto
+  	}
+  	#app .login{
+  		text-align: center;
+  	}
+  </style>
+</head>
+<body>
+<div id="app">
+	<Row>
+		<div class="login">
+			<img src="../images/danlu_logo.png">
+			<i-input type="text" placeholder="Username" v-model="username">
+        <Icon type="ios-person-outline" slot="prepend"></Icon>
+      </i-input>
+      <i-input type="password" placeholder="Password" v-model="password" style="margin-top:20px;">
+        <Icon type="ios-locked-outline" slot="prepend"></Icon>
+      </i-input>
+      <i-button type="info" style="margin-top:20px;width:182px;" @click="login()">登录</i-button>
+      <a>注册</a>
+		</div>
+	</Row>
+</div>
+<script>
+  new Vue({
+    el: '#app',
+    data:{
+    	msg:true,
+    	username:'',
+			password:''
+		},
+		methods:{
+			login:function(){
+				var that = this;
+				var reqData = {
+					username:that.username,
+					password:that.password
+				}
+				that.$http.post('/seckill/user/login', reqData, function(data, textStatus, xhr) {
+					/*optional stuff to do after success */
+          if (data.status == '0') {
+            //登陆成功
+            window.location.href="../html/secKillList.html"
+          }else{
+            if (data.status == '1') {
+              //入参不合理
+            }else{
+              //系统异常
+            };
+          }
+				});
+				
+			}
+		}
+  })
+</script>
+</body>
 </html>

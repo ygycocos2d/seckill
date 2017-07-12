@@ -32,7 +32,6 @@ public class MasterSwitchJob implements Job{
 	@Override
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
-		System.out.println(new Date(System.currentTimeMillis()));
 		try {
 			// 获取总开关状态
 			String status = switchService.getStatusByType(Constant.SECKILL_SWITCH);

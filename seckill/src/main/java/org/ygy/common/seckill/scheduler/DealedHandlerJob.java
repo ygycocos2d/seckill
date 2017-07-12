@@ -52,13 +52,13 @@ public class DealedHandlerJob implements Job{
 	@Override
 	public void execute(JobExecutionContext context)throws JobExecutionException {
 		try {
-			System.out.println("KeepAliveJob---satrt");
+			System.out.println("DealedHandlerJob---satrt");
 			ActivityInfo info = SchedulerContext.getCurActivityInfo();
 			if (null != info) {
-				System.out.println("KeepAliveJob---activity--satrt");
+				System.out.println("DealedHandlerJob---activity--satrt");
 				boolean noOk = true;
 				while(noOk) {
-					System.out.println("KeepAliveJob---activity---for---satrt");
+					System.out.println("DealedHandlerJob---activity---for---satrt");
 					
 					// 获取当前秒杀活动中所有应用实例处理的商品数:Map<appno,商品数>
 					String goodsNumberKey = Constant.Cache.GOODS_NUMBER+info.getActivityId();

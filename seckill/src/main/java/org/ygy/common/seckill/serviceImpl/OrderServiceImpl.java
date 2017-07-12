@@ -61,7 +61,7 @@ public class OrderServiceImpl implements OrderService {
 			goods.setGoodsInventory(goods.getGoodsInventory() + goodsNumber);
 			this.goodsDao.updateByPrimaryKey(goods);
 			ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
-			inventoryLog.setId(StringUtil.getUUID());
+			inventoryLog.setId(StringUtil.getClusterUUID());
 			inventoryLog.setActivityId(activityId);
 			inventoryLog.setGoodsId(goodsId);
 			inventoryLog.setGoodsInventory(goodsNumber);
@@ -85,6 +85,14 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public void update(OrderEntity order) {
 		this.orderDao.updateByPrimaryKeySelective(order);
+	}
+
+	@Override
+	public List<OrderEntity> getOrderListByUserIdAndStatus(String userId, String status) {
+		Map<String,Object> params = new HashMap<String, Object>();
+		params.put("userId", userId);
+		params.put("status", status);
+		return this.orderDao.selectOrderListByUserIdAndStatus(params);
 	}
 
 }

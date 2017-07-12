@@ -173,7 +173,7 @@ public class ActivityController {
 							if (activity.getGoodsNumber() <= goods.getGoodsInventory()) {
 								goods.setGoodsInventory(goods.getGoodsInventory()-activity.getGoodsNumber());
 								ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
-								inventoryLog.setId(StringUtil.getUUID());
+								inventoryLog.setId(StringUtil.getClusterUUID());
 								inventoryLog.setActivityId(activity.getActivityId());
 								inventoryLog.setGoodsId(goods.getGoodsId());
 								inventoryLog.setGoodsInventory(-(activity.getGoodsNumber()));
@@ -191,7 +191,7 @@ public class ActivityController {
 							GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
 							goods.setGoodsInventory(goods.getGoodsInventory()+activity.getGoodsNumber());
 							ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
-							inventoryLog.setId(StringUtil.getUUID());
+							inventoryLog.setId(StringUtil.getClusterUUID());
 							inventoryLog.setActivityId(activity.getActivityId());
 							inventoryLog.setGoodsId(goods.getGoodsId());
 							inventoryLog.setGoodsInventory(activity.getGoodsNumber());
@@ -343,13 +343,13 @@ public class ActivityController {
 			if (0 == (Integer)result.get("status")) {
 				ActivityEntity activity = new ActivityEntity();
 				this.dto2ActivityEntity(dto, activity);
-				activity.setActivityId(StringUtil.getUUID());
-				activity.setGroupId(StringUtil.getUUID());
+				activity.setActivityId(StringUtil.getClusterUUID());
+				activity.setGroupId(StringUtil.getClusterUUID());
 				if (Constant.ACTIVITY_STATUS_START.equals(dto.getStatus())) {
 					GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
 					goods.setGoodsInventory(goods.getGoodsInventory()-activity.getGoodsNumber());
 					ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
-					inventoryLog.setId(StringUtil.getUUID());
+					inventoryLog.setId(StringUtil.getClusterUUID());
 					inventoryLog.setActivityId(activity.getActivityId());
 					inventoryLog.setGoodsId(goods.getGoodsId());
 					inventoryLog.setGoodsInventory(-(activity.getGoodsNumber()));
@@ -390,7 +390,7 @@ public class ActivityController {
 							GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
 							goods.setGoodsInventory(goods.getGoodsInventory()-activity.getGoodsNumber());
 							ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
-							inventoryLog.setId(StringUtil.getUUID());
+							inventoryLog.setId(StringUtil.getClusterUUID());
 							inventoryLog.setActivityId(activity.getActivityId());
 							inventoryLog.setGoodsId(goods.getGoodsId());
 							inventoryLog.setGoodsInventory(-(activity.getGoodsNumber()));
@@ -402,7 +402,7 @@ public class ActivityController {
 							GoodsEntity goods = this.goodsService.getGoodsById(activity.getGoodsId());
 							goods.setGoodsInventory(goods.getGoodsInventory()+activity.getGoodsNumber());
 							ActivityGoodsInventoryLogEntity inventoryLog = new ActivityGoodsInventoryLogEntity();
-							inventoryLog.setId(StringUtil.getUUID());
+							inventoryLog.setId(StringUtil.getClusterUUID());
 							inventoryLog.setActivityId(activity.getActivityId());
 							inventoryLog.setGoodsId(goods.getGoodsId());
 							inventoryLog.setGoodsInventory(activity.getGoodsNumber());

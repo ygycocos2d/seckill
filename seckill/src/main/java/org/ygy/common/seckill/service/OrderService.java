@@ -17,4 +17,6 @@ public interface OrderService {
 
 	List<OrderEntity> getByOrderIdListAndStatus(Map<String, Object> param);
 
+	List<OrderEntity> getOrderListByUserIdAndStatus(String userId, String status);
+
 }

@@ -105,22 +105,10 @@ public class RedisUtil {
     	}
     	return map;
     }
-//    
-//    public static int getNum() {
-//    	int total = 0;
-//    	if (null != jedisPool) {
-//    		Jedis jedis = jedisPool.getResource();
-//    		jedis.g
-//    	} else {
-//    		
-//    	}
-//    	return total;
-//    }
     
     public static void clearAll() {
     	if (null != jedisPool) {
     		Jedis jedis = jedisPool.getResource();
-//    		jedis.del("*");
     		jedis.flushAll();
     		jedis.close();
     	} else {
@@ -165,7 +153,6 @@ public class RedisUtil {
     		Jedis jedis = jedisPool.getResource();
     		jedis.hset(key, field, value);
     		jedis.close();
-//    		jedis.hse
     	} else {
     		
     	}
