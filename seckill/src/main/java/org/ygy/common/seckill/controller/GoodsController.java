@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -15,6 +17,8 @@ import org.ygy.common.seckill.util.StringUtil;
 @Controller
 @RequestMapping("goods")
 public class GoodsController {
+	
+	private Logger       logger = LoggerFactory.getLogger(GoodsController.class);
 	
 	@Resource
 	private GoodsService goodsService;
@@ -32,6 +36,7 @@ public class GoodsController {
 				result.put("data", goods);
 			} catch (Exception e) {
 				e.printStackTrace();
+				logger.error("[GoodsController][getGoodsById][异常]", e);
 				result.put("status", -1);
 				result.put("msg", "系统异常");
 			}

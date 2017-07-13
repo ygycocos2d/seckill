@@ -6,6 +6,8 @@ import java.util.List;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.service.ActivityService;
 import org.ygy.common.seckill.service.SwitchService;
@@ -15,7 +17,9 @@ import org.ygy.common.seckill.util.StringUtil;
 
 public class MasterSwitchJob implements Job{
 	
-	private static String GID = "masterSwitch";
+	private Logger       logger = LoggerFactory.getLogger(MasterSwitchJob.class);
+	
+	private static String GID = "masterSwitchGid";
 	
 	private ActivityService activityService;
 	private SwitchService switchService;
@@ -26,6 +30,7 @@ public class MasterSwitchJob implements Job{
 			switchService = (SwitchService) SpringContextUtil.getBeanByClass(SwitchService.class);
 		} catch (Exception e) {
 			e.printStackTrace();
+			logger.error("MasterSwitchJob init exception...", e);
 		}
 	}
 
@@ -44,7 +49,7 @@ public class MasterSwitchJob implements Job{
 					// 秒杀活动定时调度链启动
 					SchedulerContext.scheduleChainStart();
 				} else {
-					System.out.println("总开关已开启，但是没有任何有效的秒杀活动！");
+					logger.info("总开关已开启，但是没有任何有效的秒杀活动！");
 				}
 			} else {
 				Date date = new Date(System.currentTimeMillis() + 3*1000);
@@ -52,7 +57,7 @@ public class MasterSwitchJob implements Job{
 						StringUtil.getUUID(), GID, date);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("MasterSwitchJob execute exception...", e);
 		}
 	}
 

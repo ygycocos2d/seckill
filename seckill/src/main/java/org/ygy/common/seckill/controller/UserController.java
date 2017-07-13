@@ -6,6 +6,8 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +22,8 @@ import org.ygy.common.seckill.util.StringUtil;
 @Controller
 @RequestMapping("user")
 public class UserController {
+	
+	private Logger       logger = LoggerFactory.getLogger(UserController.class);
 	
 	@Resource
 	private UserService userService;
@@ -56,7 +60,7 @@ public class UserController {
 					result.put("msg", "该用户不存在");
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("[UserController][login][异常]", e);
 				result.put("status", -1);
 				result.put("msg", "系统异常");
 			}
@@ -102,7 +106,7 @@ public class UserController {
 					result.put("msg", "该账号已存在");
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("[UserController][regist][异常]", e);
 				result.put("status", -1);
 				result.put("msg", "系统异常");
 			}

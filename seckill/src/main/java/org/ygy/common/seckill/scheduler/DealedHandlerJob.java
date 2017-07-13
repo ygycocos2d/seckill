@@ -10,6 +10,8 @@ import java.util.Set;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.ygy.common.seckill.util.Constant;
 import org.ygy.common.seckill.util.RedisUtil;
 
@@ -48,17 +50,17 @@ import org.ygy.common.seckill.util.RedisUtil;
  *
  */
 public class DealedHandlerJob implements Job{
+	
+	private Logger       logger = LoggerFactory.getLogger(DealedHandlerJob.class);
 
 	@Override
 	public void execute(JobExecutionContext context)throws JobExecutionException {
 		try {
-			System.out.println("DealedHandlerJob---satrt");
 			ActivityInfo info = SchedulerContext.getCurActivityInfo();
 			if (null != info) {
-				System.out.println("DealedHandlerJob---activity--satrt");
+				logger.info("DealedHandlerJob---activity--satrt");
 				boolean noOk = true;
 				while(noOk) {
-					System.out.println("DealedHandlerJob---activity---for---satrt");
 					
 					// 获取当前秒杀活动中所有应用实例处理的商品数:Map<appno,商品数>
 					String goodsNumberKey = Constant.Cache.GOODS_NUMBER+info.getActivityId();
@@ -133,6 +135,7 @@ public class DealedHandlerJob implements Job{
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			logger.error("DealedHandlerJob execute exception...", e);
 		}
 	}
 

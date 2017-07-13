@@ -11,6 +11,8 @@ import java.util.Set;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,6 +52,8 @@ import org.ygy.common.seckill.util.StringUtil;
 @Controller
 @RequestMapping("activity")
 public class ActivityController {
+	
+	private Logger       logger = LoggerFactory.getLogger(ActivityController.class);
 	
 	@Resource
 	private ActivityService activityService;
@@ -96,7 +100,7 @@ public class ActivityController {
 				result.put("msg", "秒杀已达数量上限！");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("[ActivityController][kill][异常]",e);
 			result.put("status", -1);
 			result.put("msg", "系统异常");
 		}
@@ -128,7 +132,7 @@ public class ActivityController {
 				result.put("msg", "该订单不存在！");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("[ActivityController][pay][异常]",e);
 			result.put("status", -1);
 			result.put("msg", "系统异常");
 		}
@@ -205,7 +209,7 @@ public class ActivityController {
 			}
 			result.put("status", 0);	
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("[ActivityController][updateStatus][异常]",e);
 			result.put("status", -1);	
 			result.put("msg", "系统异常");
 		}
@@ -360,7 +364,7 @@ public class ActivityController {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("[ActivityController][addActivity][异常]",e);
 			result.put("status", -1);
 			result.put("msg", "系统异常");
 		}
@@ -421,7 +425,7 @@ public class ActivityController {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("[ActivityController][updateActivity][异常]",e);
 			result.put("status", -1);
 			result.put("msg", "系统异常");
 		}
@@ -441,7 +445,7 @@ public class ActivityController {
 			result.put("status", 0);
 			result.put("data", activityList);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("[ActivityController][getActivityListInStartup][异常]",e);
 			result.put("status", -1);
 			result.put("msg", "系统异常");
 		}
@@ -519,7 +523,7 @@ public class ActivityController {
 				return result;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("[ActivityController][validateActivity][异常]",e);
 			result.put("status", -1);
 			result.put("msg", "系统异常");
 		}

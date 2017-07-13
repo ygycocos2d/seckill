@@ -3,6 +3,8 @@ package org.ygy.common.seckill.scheduler;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.ygy.common.seckill.util.Constant;
 import org.ygy.common.seckill.util.RedisUtil;
 
@@ -12,6 +14,8 @@ import org.ygy.common.seckill.util.RedisUtil;
  *
  */
 public class KeepAliveJob implements Job{
+	
+	private Logger       logger = LoggerFactory.getLogger(KeepAliveJob.class);
 
 	@Override
 	public void execute(JobExecutionContext context)throws JobExecutionException {
@@ -21,6 +25,7 @@ public class KeepAliveJob implements Job{
 			RedisUtil.setEx(aliveKey,"1",SchedulerContext.getDumptime()); 
 		}catch(Exception e) {
 			e.printStackTrace();
+			logger.error("KeepAliveJob execute exception...", e);
 		}
 	}
 

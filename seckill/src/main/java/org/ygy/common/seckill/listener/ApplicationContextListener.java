@@ -7,6 +7,8 @@ import javax.servlet.ServletContextListener;
 
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.ygy.common.seckill.scheduler.DealedHandlerJob;
 import org.ygy.common.seckill.scheduler.KeepAliveJob;
 import org.ygy.common.seckill.scheduler.MasterSwitchJob;
@@ -15,14 +17,16 @@ import org.ygy.common.seckill.util.QuartzUtil;
 
 public class ApplicationContextListener implements ServletContextListener {
 	
+	private Logger       logger = LoggerFactory.getLogger(ApplicationContextListener.class);
+	
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		System.out.println("The application start...");
+		logger.info("The application start...");
 		try {
 			// 创建Quartz任务调度器，并启动
 			SchedulerContext.setQuartzUtil(new QuartzUtil(new StdSchedulerFactory().getScheduler()));
 			SchedulerContext.getQuartzUtil().start();
-			System.out.println("The quartz scheduler start...");
+			logger.info("The quartz scheduler start...");
 			
 			// 启动集群中应用实例相互检测job
 			SchedulerContext.getQuartzUtil().add(KeepAliveJob.class, "keepAliveJobId",
@@ -34,19 +38,19 @@ public class ApplicationContextListener implements ServletContextListener {
 			SchedulerContext.getQuartzUtil().add(MasterSwitchJob.class, "masterSwitchJobId",
 					"masterSwitchJobGid", new Date());
 		} catch (SchedulerException e) {
-			e.printStackTrace();
+			logger.error("The application start exception...", e);
 		}
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		System.out.println("The application stop...");
+		logger.info("The application stop...");
 		try {
 			// Quartz shutdown
 			SchedulerContext.getQuartzUtil().shutdown(false);;
-			System.out.println("The quartz scheduler stop...");
+			logger.info("The quartz scheduler stop...");
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("The application stop exception...", e);
 		}
 	}
 }

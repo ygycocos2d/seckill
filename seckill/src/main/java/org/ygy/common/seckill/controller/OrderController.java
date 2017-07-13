@@ -8,6 +8,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -19,6 +21,8 @@ import org.ygy.common.seckill.util.Constant;
 @Controller
 @RequestMapping("order")
 public class OrderController {
+	
+	private Logger       logger = LoggerFactory.getLogger(OrderController.class);
 	
 	@Resource
 	private OrderService orderService;
@@ -40,10 +44,11 @@ public class OrderController {
 				result.put("status", 0);
 				result.put("data", orderList);
 			} else {
-				
+				result.put("status", 1);
+				result.put("msg", "请登录");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("[OrderController][getOrderListByStatus][异常]", e);
 			result.put("status", -1);
 			result.put("msg", "系统异常");
 		}

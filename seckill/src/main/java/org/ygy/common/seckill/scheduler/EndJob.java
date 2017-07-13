@@ -11,6 +11,8 @@ import java.util.Set;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.entity.ActivityGoodsInventoryLogEntity;
 import org.ygy.common.seckill.entity.ActivityOrderRelationEntity;
@@ -26,6 +28,8 @@ import org.ygy.common.seckill.util.SpringContextUtil;
 import org.ygy.common.seckill.util.StringUtil;
 
 public class EndJob implements Job {
+	
+	private Logger       logger = LoggerFactory.getLogger(EndJob.class);
 	
 	private GoodsService goodsService;
 	
@@ -45,7 +49,7 @@ public class EndJob implements Job {
 			inventoryLogService = (ActivityGoodsInventoryLogService) SpringContextUtil.getBeanByClass(ActivityGoodsInventoryLogService.class);
 			relationService = (ActivityOrderRelationService) SpringContextUtil.getBeanByClass(ActivityOrderRelationService.class);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("EndJob init exception...",e);
 		}
 	}
 
@@ -53,9 +57,9 @@ public class EndJob implements Job {
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
 		try {
-			System.out.println("endjob start---------------------");
 			// 将当前结束的秒杀活动备份，用于活动结束后的相关处理
 			ActivityInfo tempInfo = SchedulerContext.getCurActivityInfo();
+			logger.info("endjob start activityId="+tempInfo.getActivityId());
 			SchedulerContext.setCurActivityInfo(null);
 			// 如果有下一个秒杀活动，则进行任务调度
 			ActivityEntity entity = SchedulerContext.getActivityQueue().getHeaderNotDel();
@@ -137,7 +141,7 @@ public class EndJob implements Job {
 							this.successLogService.addSuccessLogBatch(logEntityList);
 							succLogFlag = true;
 						} catch (Exception e) {
-							e.printStackTrace();
+							logger.error("EndJob execute[successLogService.addSuccessLogBatch] exception...",e);
 						}
 					}
 					// 订单列表存库
@@ -146,7 +150,7 @@ public class EndJob implements Job {
 							this.orderService.addOrderBatch(orderList);
 							orderFlag = true;
 						} catch (Exception e) {
-							e.printStackTrace();
+							logger.error("EndJob execute[orderService.addOrderBatch] exception...",e);
 						}
 					}
 					// 活动订单关联存库
@@ -155,7 +159,7 @@ public class EndJob implements Job {
 							this.relationService.addBatch(relationList);
 							relarionFlag = true;
 						} catch (Exception e) {
-							e.printStackTrace();
+							logger.error("EndJob execute[relationService.addBatch] exception...",e);
 						}
 					}
 					// 商品还库存
@@ -164,7 +168,7 @@ public class EndJob implements Job {
 							this.goodsService.update(goods);
 							goodsFlag = true;
 						} catch (Exception e) {
-							e.printStackTrace();
+							logger.error("EndJob execute[goodsService.update] exception...",e);
 						}
 					}
 					// 商品库存记录去向
@@ -173,7 +177,7 @@ public class EndJob implements Job {
 							this.inventoryLogService.add(inventoryLog);
 							inventoryLogFlag = true;
 						} catch (Exception e) {
-							e.printStackTrace();
+							logger.error("EndJob execute[inventoryLogService.add] exception...",e);
 						}
 					}
 					if (succLogFlag&&orderFlag&&goodsFlag&&inventoryLogFlag) {
@@ -187,9 +191,8 @@ public class EndJob implements Job {
 			String group = tempInfo.getActivityGid() + "_orderAutoCancel";
 			Date date = new Date(System.currentTimeMillis() + 1000*tempInfo.getPayDelay());
 			SchedulerContext.getQuartzUtil().add(OrderAutoCancelJob.class, name, group, date);
-		
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("EndJob execute exception...",e);
 		}
 	}
 

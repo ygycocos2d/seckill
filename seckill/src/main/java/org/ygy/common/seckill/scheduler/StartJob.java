@@ -6,6 +6,8 @@ import java.util.List;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.entity.ImgEntity;
@@ -17,6 +19,8 @@ import org.ygy.common.seckill.util.SpringContextUtil;
 
 public class StartJob implements Job {
 	
+	private Logger       logger = LoggerFactory.getLogger(StartJob.class);
+	
 	private ImgService imgService;
 	
 	public StartJob() {
@@ -24,6 +28,7 @@ public class StartJob implements Job {
 			imgService = (ImgService) SpringContextUtil.getBeanByClass(ImgService.class);
 		} catch (Exception e) {
 			e.printStackTrace();
+			logger.error("StartJob init exception...",e);
 		}
 	}
 
@@ -55,7 +60,7 @@ public class StartJob implements Job {
 					Date date = new Date(curActivityInfo.getEndTime());
 					SchedulerContext.getQuartzUtil().add(EndJob.class, name, group, date);
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error("StartJob execute exception...",e);
 				}
 			}
 		}
@@ -78,7 +83,7 @@ public class StartJob implements Job {
 			curActivity.setPayDelay(entity.getPayDelay());
 			curActivity.setDescribt(entity.getDescribt());
 		} catch (Exception e) {
-			System.out.println("entity2Info异常"+e);
+			logger.error("StartJob execute[entity2Info] exception...",e);
 		}
 	}
 
