@@ -162,7 +162,6 @@ public class RedisUtil {
     	if (null != jedisPool) {
     		Jedis jedis = jedisPool.getResource();
     		String ok = jedis.setex(key, seconds, value);
-    		System.out.println("-----------------"+ok);
     		jedis.close();
     	} else {
     		

@@ -19,7 +19,7 @@ public class MasterSwitchJob implements Job{
 	
 	private Logger       logger = LoggerFactory.getLogger(MasterSwitchJob.class);
 	
-	private static String GID = "masterSwitchGid";
+	private static final String GID = "masterSwitchGid";
 	
 	private ActivityService activityService;
 	private SwitchService switchService;
