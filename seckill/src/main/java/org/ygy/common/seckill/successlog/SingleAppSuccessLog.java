@@ -64,6 +64,12 @@ public class SingleAppSuccessLog implements ISuccessLog {
 		return false;
 	}
 
+	@Override
+	public void setHandledFlagForActivitySuccLog(String activityId) {
+		// TODO Auto-generated method stub
+		
+	}
+
 //	@Override
 //	public void setHandledFlagForActivitySuccLog(String activityId) {
 //		// TODO Auto-generated method stub

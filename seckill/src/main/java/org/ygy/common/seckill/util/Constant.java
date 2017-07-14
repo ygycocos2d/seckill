@@ -22,6 +22,9 @@ public class Constant {
 		final String SUCC_HANDLED_FLAG = "succHandled_";
 		final String COMED = "comed_";
 		
+		
+		final String ALIVE_APP_MAP = "aliveAppMap";
+		
 		/**
 		 *  秒杀succLog处理状态flag
 		 *  1、保证只有一个应用实例处理succLog

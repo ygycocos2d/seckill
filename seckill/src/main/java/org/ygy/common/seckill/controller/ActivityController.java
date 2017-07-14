@@ -453,6 +453,33 @@ public class ActivityController {
 	}
 	
 	/**
+	 * 获取进行中的秒杀活动
+	 * @return
+	 */
+	@RequestMapping("getCurActivity")
+	@ResponseBody
+	public Map<String,Object> getCurActivity() {
+		Map<String,Object> result = new HashMap<String,Object>();
+		try {
+			// 只有总开关开启，才能查到进行中的秒杀活动
+			ActivityInfo curActivity = SchedulerContext.getCurActivityInfo();
+			if (null != curActivity && curActivity.getStartTime() <= System.currentTimeMillis()
+					&& curActivity.getEndTime() >= System.currentTimeMillis()) {
+				result.put("status", 0);
+				result.put("data", curActivity);
+			} else {
+				result.put("status", 1);
+				result.put("msg", "当前没有进行的秒杀活动");
+			}
+		} catch (Exception e) {
+			logger.error("[ActivityController][getCurActivity][异常]",e);
+			result.put("status", -1);
+			result.put("msg", "系统异常");
+		}
+		return result;
+	}
+	
+	/**
 	 * 校验新增、修改活动时活动设置的正确性
 	 * @param dto
 	 * @param isAdd 

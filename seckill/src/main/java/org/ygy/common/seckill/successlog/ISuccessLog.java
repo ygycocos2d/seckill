@@ -37,5 +37,9 @@ public interface ISuccessLog {
 	
 	boolean getHandledFlagFromActivitySuccLog(String activityId);
 	
-//	void setHandledFlagForActivitySuccLog(String activityId);
+	/**
+	 * 设置为已处理
+	 * @param activityId
+	 */
+	void setHandledFlagForActivitySuccLog(String activityId);
 }

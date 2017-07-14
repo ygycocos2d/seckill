@@ -27,6 +27,8 @@ import org.ygy.common.seckill.service.SuccessLogService;
 import org.ygy.common.seckill.util.SpringContextUtil;
 import org.ygy.common.seckill.util.StringUtil;
 
+import com.alibaba.fastjson.JSONObject;
+
 public class EndJob implements Job {
 	
 	private Logger       logger = LoggerFactory.getLogger(EndJob.class);
@@ -91,7 +93,7 @@ public class EndJob implements Job {
 					}
 					// 秒杀记录
 					SuccessLogEntity logEntity = new SuccessLogEntity();
-					logEntity.setSucclogId(StringUtil.getUUID());
+					logEntity.setSucclogId(StringUtil.getClusterUUID());
 					logEntity.setActivityId(tempInfo.getActivityId());
 					logEntity.setUserId(en.getKey());
 					logEntity.setGoodsNumber(en.getValue());//如果秒杀数不正常，可以通过记录查看到
@@ -99,7 +101,7 @@ public class EndJob implements Job {
 					logEntityList.add(logEntity);
 					// 生成订单
 					OrderEntity order = new OrderEntity();
-					order.setOrderId(StringUtil.getUUID());
+					order.setOrderId(StringUtil.getClusterUUID());
 					order.setGoodsId(tempInfo.getGoodsId());
 					order.setGoodsNumber(validSeckillCount);
 					order.setUserId(en.getKey());
@@ -121,7 +123,7 @@ public class EndJob implements Job {
 					goods.setGoodsInventory(goods.getGoodsInventory() + toStock);
 					
 					inventoryLog = new ActivityGoodsInventoryLogEntity();
-					inventoryLog.setId(StringUtil.getUUID());
+					inventoryLog.setId(StringUtil.getClusterUUID());
 					inventoryLog.setActivityId(tempInfo.getActivityId());
 					inventoryLog.setGoodsId(goods.getGoodsId());
 					inventoryLog.setGoodsInventory(toStock);
@@ -142,6 +144,9 @@ public class EndJob implements Job {
 							succLogFlag = true;
 						} catch (Exception e) {
 							logger.error("EndJob execute[successLogService.addSuccessLogBatch] exception...",e);
+							if (1==count) {//3次都失败，存日志吧，人工处理
+								logger.info("[活动ID为="+tempInfo.getActivityId()+"]"+"[秒杀成功记录]=>"+JSONObject.toJSONString(logEntityList));
+							}
 						}
 					}
 					// 订单列表存库
@@ -151,6 +156,9 @@ public class EndJob implements Job {
 							orderFlag = true;
 						} catch (Exception e) {
 							logger.error("EndJob execute[orderService.addOrderBatch] exception...",e);
+							if (1==count) {
+								logger.info("[活动ID为="+tempInfo.getActivityId()+"]"+"[秒杀成功订单]=>"+JSONObject.toJSONString(orderList));
+							}
 						}
 					}
 					// 活动订单关联存库
@@ -160,6 +168,9 @@ public class EndJob implements Job {
 							relarionFlag = true;
 						} catch (Exception e) {
 							logger.error("EndJob execute[relationService.addBatch] exception...",e);
+							if (1==count) {
+								logger.info("[活动ID为="+tempInfo.getActivityId()+"]"+"[秒杀成功订单活动关联]=>"+JSONObject.toJSONString(relationList));
+							}
 						}
 					}
 					// 商品还库存
@@ -169,6 +180,9 @@ public class EndJob implements Job {
 							goodsFlag = true;
 						} catch (Exception e) {
 							logger.error("EndJob execute[goodsService.update] exception...",e);
+							if (1==count) {
+								logger.info("[活动ID为="+tempInfo.getActivityId()+"]"+"[商品还库存]=>"+JSONObject.toJSONString(goods));
+							}
 						}
 					}
 					// 商品库存记录去向
@@ -178,12 +192,17 @@ public class EndJob implements Job {
 							inventoryLogFlag = true;
 						} catch (Exception e) {
 							logger.error("EndJob execute[inventoryLogService.add] exception...",e);
+							if (1==count) {
+								logger.info("[活动ID为="+tempInfo.getActivityId()+"]"+"[商品库存记录去向]=>"+JSONObject.toJSONString(inventoryLog));
+							}
 						}
 					}
 					if (succLogFlag&&orderFlag&&goodsFlag&&inventoryLogFlag) {
 						break;
 					}
 				}
+				// 标识已处理，其他应用实例不用再出来了
+				SchedulerContext.getSucLog().setHandledFlagForActivitySuccLog(tempInfo.getActivityId());
 			}
 			
 			// 秒杀生成的订单超时不支付自动取消--定时任务启动

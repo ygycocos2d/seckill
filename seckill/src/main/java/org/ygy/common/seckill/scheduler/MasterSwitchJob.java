@@ -41,6 +41,7 @@ public class MasterSwitchJob implements Job{
 			// 获取总开关状态
 			String status = switchService.getStatusByType(Constant.SECKILL_SWITCH);
 			if ("1".equals(status)) {
+				SchedulerContext.setMasterSwitch(true);
 				// 获取有效的秒杀活动
 				List<ActivityEntity> activityList = this.activityService.getAllEffectiveActivity();
 				if (null != activityList && !activityList.isEmpty()) {

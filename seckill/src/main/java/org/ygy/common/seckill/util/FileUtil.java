@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -12,6 +14,8 @@ import org.springframework.util.DefaultPropertiesPersister;
 import org.springframework.util.PropertiesPersister;
 
 public class FileUtil {
+	
+	private static Logger       logger = LoggerFactory.getLogger(FileUtil.class);
 	
 	/**
 	 * 默认编码
@@ -37,13 +41,13 @@ public class FileUtil {
 				is = resource.getInputStream();
 				propertiesPersister.load(props, new InputStreamReader(is, DEFAULT_ENCODING));
 			} catch (IOException e) {
-				System.out.println(e);
+				logger.error("加载配置文件"+location+"失败", e);
 			} finally {
 				if (null != is) {
 					try {
 						is.close();
 					} catch (IOException e) {
-						System.out.println("流关闭异常：" + e);
+						logger.error("流关闭异常", e);
 					}
 				}
 			}

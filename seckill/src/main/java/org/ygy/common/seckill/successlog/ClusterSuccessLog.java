@@ -78,9 +78,9 @@ public class ClusterSuccessLog implements ISuccessLog {
 		return false;
 	}
 
-//	@Override
-//	public void setHandledFlagForActivitySuccLog(String activityId) {
-//		RedisUtil.setHashMapValue(Constant.SUCC_HANDLED_FLAG, activityId, "1");
-//	}
+	@Override
+	public void setHandledFlagForActivitySuccLog(String activityId) {
+		RedisUtil.set(Constant.Cache.SUCC_HANDLED_FLAG+activityId, Constant.Cache.HANDLED);
+	}
 
 }
