@@ -2,7 +2,7 @@
 <configuration>  
 
 	<!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径-->
-    <property name="LOG_HOME" value="d:/log/seckill" />
+    <property name="LOG_HOME" value="e:/log/seckill" />
 	
   
     <!-- ch.qos.logback.core.ConsoleAppender 控制台输出 -->  
