@@ -86,9 +86,11 @@ public class ActivityController {
 				if (goodsNum.getAndDecrementWhenGzero() > 0) {
 					SchedulerContext.getSucLog().setGoodsNumerOfUserInActivity(curActivityInfo.getActivityId(),
 							userId, (num+1));
-					// 我在想有没有必要启动线程来处理这步操作
-					RedisUtil.setHashMapValue(Constant.Cache.GOODS_NUMBER+curActivityInfo.getActivityId(), 
-							SchedulerContext.getAppno(), ""+goodsNum.get());
+					// 我在想有没有必要启动线程来处理这步操作,只是想表达异步的意思
+//					RedisUtil.setHashMapValue(Constant.Cache.GOODS_NUMBER+curActivityInfo.getActivityId(), 
+//							SchedulerContext.getAppno(), ""+goodsNum.get());
+					RedisUtil.hincrBy(Constant.Cache.GOODS_NUMBER+curActivityInfo.getActivityId(),
+							SchedulerContext.getAppno(), -1L);
 				} else {
 					// 秒杀完了,秒杀结束
 					result.put("status", 2);

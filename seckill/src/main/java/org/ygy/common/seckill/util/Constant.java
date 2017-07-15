@@ -16,23 +16,16 @@ public class Constant {
 	
 	public static interface Cache{
 		// 缓存key前缀
-		final String KEEP_ALIVE = "keepAlive_";
-		final String GOODS_NUMBER = "goodsNumber_";
-		final String SUCC_LOG = "succLog_";
-		final String SUCC_HANDLED_FLAG = "succHandled_";
-		final String COMED = "comed_";
+		final String KEEP_ALIVE = "keepAlive:";
+		final String GOODS_NUMBER = "goodsNumber:";
+		final String SUCC_LOG = "succLog:";
+		final String SUCC_HANDLED_FLAG = "succHandled:";
+		final String START_COMED = "startComed:";//活动开始，各应用实例平分商品数记录缓存前缀
+		final String DUMP_COMED = "dumpComed:";//某实例应用dump机，其他活着的应用实例平分其商品数记录缓存前缀
+		final String LOCK = "lock:";
 		
 		
 		final String ALIVE_APP_MAP = "aliveAppMap";
-		
-		/**
-		 *  秒杀succLog处理状态flag
-		 *  1、保证只有一个应用实例处理succLog
-		 *  2、当处理succLog的实例出现异常时（如宕机），可根据这些状态进行后续的人工处理（可以是一个管理应用）
-		 */
-		final String UNHANDLE = null;//未处理
-		final String HANDLING = "1";//处理中
-		final String HANDLED = "2";//已处理
 	}
 	
 	//总开关类型

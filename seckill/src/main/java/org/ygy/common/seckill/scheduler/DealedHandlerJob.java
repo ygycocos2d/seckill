@@ -1,8 +1,5 @@
 package org.ygy.common.seckill.scheduler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -13,6 +10,7 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ygy.common.seckill.util.Constant;
+import org.ygy.common.seckill.util.RedisLock;
 import org.ygy.common.seckill.util.RedisUtil;
 
 /**
@@ -59,82 +57,53 @@ public class DealedHandlerJob implements Job{
 			ActivityInfo info = SchedulerContext.getCurActivityInfo();
 			if (null != info) {
 				logger.info("DealedHandlerJob---activity--satrt");
-				boolean noOk = true;
-				while(noOk) {
+				Map<String, Object> resultMap = KeepAliveJob.getAliveApp();
+				@SuppressWarnings("unchecked")
+				Map<String,Boolean> aliveMap = (Map<String,Boolean>)resultMap.get("aliveMap");
+				int aliveNum = (int) resultMap.get("aliveNum");
+				if (aliveMap.size() > aliveNum) {//有应用dump机了
 					
 					// 获取当前秒杀活动中所有应用实例处理的商品数:Map<appno,商品数>
 					String goodsNumberKey = Constant.Cache.GOODS_NUMBER+info.getActivityId();
 					Map<String, String> goodsNumberMap = RedisUtil.getHashMap(goodsNumberKey);
 					
-					// 获取所有应用实例是否活着
-			    	List<String> keyList = new ArrayList<String>();
-			    	for(Entry<String, String> en : goodsNumberMap.entrySet()) {
-			    		keyList.add(Constant.Cache.KEEP_ALIVE + en.getKey());
-			    	}
-			    	String[] keys = keyList.toArray(new String[keyList.size()]);
-			    	Map<String, Boolean> aliveMap = new HashMap<String, Boolean>();//Map<appno,是否活着>
-			    	int aliveNum = 0;
-			    	if (keys.length > 0) {
-			    		List<String> appNoStatus = RedisUtil.getByKeys(keys);
-			    		for (int i=0;i<appNoStatus.size();i++) {
-			    			String key = keys[i].substring( (keys[i].indexOf("_")+1) );
-				    		if (null != appNoStatus.get(i)) {
-				    			aliveMap.put(key, true);
-				    			aliveNum ++;
-				    		} else {
-				    			aliveMap.put(key, false);
-				    		}
-				    	}
-			    	}
-			    	
-			    	// 如果有应用实例挂掉了,平分该应用未处理的商品数
-			    	if (aliveNum < keys.length) {
-			    		for(Entry<String, Boolean> en : aliveMap.entrySet()){
-			    			if (!en.getValue()) {
-			    				int goodsNumer = Integer.valueOf(goodsNumberMap.get(en.getKey()));
-			    				if (goodsNumer <= 0) {//没有待处理商品数，挂就挂了不用管了
-			    					RedisUtil.hdelete(goodsNumberKey,en.getKey());
-			    					noOk = false;
-			    					continue;
-			    				}
-			    				String comedKey = Constant.Cache.COMED+info.getActivityId()+"_"+en.getKey();
-			    				Set<String> set = RedisUtil.smembers(comedKey);
-			    				int num = 0;
-			    				// 商品数非0但所有活着的应用实例都平分过该宕机实例的商品数了，说明又有应用挂了
-			    				if (aliveNum == set.size()) {
-			    					num = goodsNumer;//把剩下的商品直接处理了
-			    				} else {
-			    					// 如果当前实例已经平分过该挂掉的实例的待处理的商品数
-				    				if (set.contains(SchedulerContext.getAppno())) {
-				    					noOk = false;
-				    					continue;
+					// 平分宕机应用实例未处理完的商品数
+					for(Entry<String, Boolean> en : aliveMap.entrySet()){
+		    			if (!en.getValue()) {
+		    				String comedKey = Constant.Cache.DUMP_COMED+info.getActivityId()+"_"+en.getKey();
+		    				String lockKey = Constant.Cache.LOCK + comedKey;
+							RedisLock lock = new RedisLock(lockKey);//互斥锁
+							if (lock.acquireLockWithTimeout(
+									RedisUtil.getConnect(), 5000L, 3000L)) {
+								int goodsNumer = Integer.valueOf(goodsNumberMap.get(en.getKey()));
+			    				if (goodsNumer > 0) {
+			    					Set<String> set = RedisUtil.smembers(comedKey);
+				    				int num = 0;
+				    				// 商品数非0但所有活着的应用实例都平分过该宕机实例的商品数了，说明又有应用挂了
+				    				if (aliveNum <= set.size()) {
+				    					num = goodsNumer;//把剩下的商品直接处理了
+				    				} else {
+				    					// 如果当前实例已经平分过该挂掉的实例的待处理的商品数
+					    				if (set.contains(SchedulerContext.getAppno())) {
+					    					continue;
+					    				}
+					    				// 平分该宕机实例未处理的商品数
+					    				if (aliveNum-set.size() > 0) {
+					    					num = goodsNumer/(aliveNum-set.size());
+					    				}
 				    				}
-				    				// 平分该宕机实例未处理的商品数
-				    				if (aliveNum-set.size() != 0) {
-				    					num = goodsNumer/(aliveNum-set.size());
-				    				}
+				    				RedisUtil.setHashMapValue(goodsNumberKey, en.getKey(), ""+(goodsNumer-num));
+				    				RedisUtil.sadd(comedKey, SchedulerContext.getAppno());
+				    				int newNum = info.getGoodsNum().addAndGet(num);
+				    				RedisUtil.setHashMapValue(goodsNumberKey, SchedulerContext.getAppno(), ""+newNum);
 			    				}
-			    				
-			    				// 更新宕机应用实例商品数及被平分记录、当前应用实例商品数
-			    				int oldGoodsNumber = Integer.valueOf(RedisUtil.getHashMapValue(goodsNumberKey, en.getKey()));
-			    				if (oldGoodsNumber != goodsNumer) {//避免宕机实例的商品数不一致（其实还是有可能出现不一致，这里只是尽量减少）
-			    					noOk = true;
-			    					break;
-			    				}
-			    				RedisUtil.setHashMapValue(goodsNumberKey, en.getKey(), ""+(goodsNumer-num));
-			    				RedisUtil.sadd(comedKey, SchedulerContext.getAppno());
-			    				int newNum = info.getGoodsNum().addAndGet(num);
-			    				RedisUtil.setHashMapValue(goodsNumberKey, SchedulerContext.getAppno(), ""+newNum);
-			    				noOk = false;
-			    			}
-			    		}
-			    	} else {
-			    		noOk = false;
-			    	}
-				}
+			    				lock.releaseLock(RedisUtil.getConnect());
+							}
+		    			}
+		    		}
+				}	
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("DealedHandlerJob execute exception...", e);
 		}
 	}

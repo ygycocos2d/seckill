@@ -67,20 +67,20 @@ public class ClusterSuccessLog implements ISuccessLog {
 
 	@Override
 	public boolean getHandledFlagFromActivitySuccLog(String activityId) {
-		String handled = RedisUtil.getAndSet(Constant.Cache.SUCC_HANDLED_FLAG+activityId, Constant.Cache.HANDLING);
-		if (Constant.Cache.HANDLED.equals(handled)) {//旧值为已处理，重设为已处理
-			RedisUtil.set(Constant.Cache.SUCC_HANDLED_FLAG+activityId, Constant.Cache.HANDLED);
-			return true;
-		}
-		if (Constant.Cache.HANDLING.equals(handled)) {//旧值为处理中，说明正在被其他实例处理
-			return true;
-		}
+//		String handled = RedisUtil.getAndSet(Constant.Cache.SUCC_HANDLED_FLAG+activityId, Constant.Cache.HANDLING);
+//		if (Constant.Cache.HANDLED.equals(handled)) {//旧值为已处理，重设为已处理
+//			RedisUtil.set(Constant.Cache.SUCC_HANDLED_FLAG+activityId, Constant.Cache.HANDLED);
+//			return true;
+//		}
+//		if (Constant.Cache.HANDLING.equals(handled)) {//旧值为处理中，说明正在被其他实例处理
+//			return true;
+//		}
 		return false;
 	}
 
 	@Override
 	public void setHandledFlagForActivitySuccLog(String activityId) {
-		RedisUtil.set(Constant.Cache.SUCC_HANDLED_FLAG+activityId, Constant.Cache.HANDLED);
+//		RedisUtil.set(Constant.Cache.SUCC_HANDLED_FLAG+activityId, Constant.Cache.HANDLED);
 	}
 
 }

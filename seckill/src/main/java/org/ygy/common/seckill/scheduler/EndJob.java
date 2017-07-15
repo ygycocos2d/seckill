@@ -24,6 +24,9 @@ import org.ygy.common.seckill.service.ActivityOrderRelationService;
 import org.ygy.common.seckill.service.GoodsService;
 import org.ygy.common.seckill.service.OrderService;
 import org.ygy.common.seckill.service.SuccessLogService;
+import org.ygy.common.seckill.util.Constant;
+import org.ygy.common.seckill.util.RedisLock;
+import org.ygy.common.seckill.util.RedisUtil;
 import org.ygy.common.seckill.util.SpringContextUtil;
 import org.ygy.common.seckill.util.StringUtil;
 
@@ -73,7 +76,10 @@ public class EndJob implements Job {
 			/**
 			 *  进行当前秒杀活动结束后的一些操作（tempInfo），统计实际抢了多少，有多少被多抢了，生成订单、还库存等
 			 */
-			if (!SchedulerContext.getSucLog().getHandledFlagFromActivitySuccLog(tempInfo.getActivityId())) {
+			String lockKey = Constant.Cache.LOCK+Constant.Cache.SUCC_HANDLED_FLAG+tempInfo.getActivityId();
+			RedisLock lock = new RedisLock(lockKey,false);//一次锁
+			if (lock.acquireLockWithTimeout(
+					RedisUtil.getConnect(), 0L, 0L)) {
 				Map<String, Integer> killSucLog = SchedulerContext.getSucLog().getSuccLogInActivity(tempInfo.getActivityId());
 				// 构建秒杀成功记录list
 				List<SuccessLogEntity> logEntityList = new ArrayList<SuccessLogEntity>();
@@ -114,8 +120,14 @@ public class EndJob implements Job {
 					relation.setOrderId(order.getOrderId());
 					relationList.add(relation);
 				}
-				// 商品还库存
-				int toStock = tempInfo.getGoodsNum().intValue() + invalidSeckillTotalCount;
+				// 商品还库存,无效秒杀商品数+未秒杀完的商品数
+//				int toStock = tempInfo.getGoodsNum().intValue() + invalidSeckillTotalCount;
+				int seckillLeft = 0;
+				Map<String, String> goodsMap = RedisUtil.getHashMap(Constant.Cache.GOODS_NUMBER+tempInfo.getActivityId());
+				for (Entry<String, String> entry:goodsMap.entrySet()) {
+					seckillLeft += Integer.parseInt(entry.getValue()); 
+				}
+				int toStock = invalidSeckillTotalCount + seckillLeft;
 				GoodsEntity goods = null;
 				ActivityGoodsInventoryLogEntity inventoryLog = null;
 				if (toStock > 0) {
@@ -128,7 +140,7 @@ public class EndJob implements Job {
 					inventoryLog.setGoodsId(goods.getGoodsId());
 					inventoryLog.setGoodsInventory(toStock);
 					inventoryLog.setCreateTime(new Date());
-					inventoryLog.setDescribt("活动-->商品，活动结束还库存，活动剩余="+tempInfo.getGoodsNum().intValue()+",用户多抢="+invalidSeckillTotalCount);
+					inventoryLog.setDescribt("活动-->商品，活动结束还库存，活动剩余="+seckillLeft+",用户多抢="+invalidSeckillTotalCount);
 				}
 				
 				boolean succLogFlag = false;
@@ -201,8 +213,6 @@ public class EndJob implements Job {
 						break;
 					}
 				}
-				// 标识已处理，其他应用实例不用再出来了
-				SchedulerContext.getSucLog().setHandledFlagForActivitySuccLog(tempInfo.getActivityId());
 			}
 			
 			// 秒杀生成的订单超时不支付自动取消--定时任务启动

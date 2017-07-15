@@ -60,7 +60,7 @@ public class KeepAliveJob implements Job{
     		
         	List<String> appNoStatus = RedisUtil.getByKeys(keys);
         	for (int i=0;i<appNoStatus.size();i++) {
-        		String key = keys[i].substring( (keys[i].indexOf("_")+1) );
+        		String key = keys[i].substring( (keys[i].indexOf(":")+1) );
     	    	if (null != appNoStatus.get(i)) {
     	    		aliveMap.put(key, true);
     	    		aliveNum ++;

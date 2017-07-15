@@ -66,6 +66,17 @@ public class RedisUtil {
         	}
         }
     }
+    public static String get(String key) {
+    	if (null != jedisPool) {
+    		Jedis jedis = jedisPool.getResource();
+    		String value = jedis.get(key);
+    		jedis.close();
+    		return value;
+    	} else {
+    		
+    	}
+    	return null;
+    }
     
     public static void set(String key, String value) {
     	if (null != jedisPool) {
@@ -76,15 +87,13 @@ public class RedisUtil {
     		
     	}
     }
-    
-    public static String get(String key) {
+    /**
+     * 获取redis连接
+     * @return
+     */
+    public static Jedis getConnect() {
     	if (null != jedisPool) {
-    		Jedis jedis = jedisPool.getResource();
-    		String value = jedis.get(key);
-    		jedis.close();
-    		return value;
-    	} else {
-    		
+    		return jedisPool.getResource();
     	}
     	return null;
     }
@@ -161,7 +170,7 @@ public class RedisUtil {
     public static void setEx(String key, String value, int seconds) {
     	if (null != jedisPool) {
     		Jedis jedis = jedisPool.getResource();
-    		String ok = jedis.setex(key, seconds, value);
+    		jedis.setex(key, seconds, value);
     		jedis.close();
     	} else {
     		
@@ -227,7 +236,15 @@ public class RedisUtil {
     	}
     }
     
-    
+    public static void hincrBy(String key, String field, long value) {
+    	if (null != jedisPool) {
+    		Jedis jedis = jedisPool.getResource();
+    		jedis.hincrBy(key, field, value);
+    		jedis.close();
+    	} else {
+    		
+    	}
+    }
     
     public static String getAndSet(String key, String newValue) {
     	String oldValue = null;
@@ -262,7 +279,9 @@ public class RedisUtil {
     
     public static void main(String[] args) {
     	
-    	getAndSet("","");
+    	hincrBy("goodsNumber:a0397652140c40deacba69cbeabfe973","1",-11L);
+    	
+//    	getAndSet("","");
 //    	String handled = RedisUtil.getHashMapValue(Constant.SUCC_HANDLED_FLAG, "55446");
 //    	
 //    	System.out.println(handled);

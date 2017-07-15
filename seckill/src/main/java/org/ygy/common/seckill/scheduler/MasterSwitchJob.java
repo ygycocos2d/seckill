@@ -29,7 +29,6 @@ public class MasterSwitchJob implements Job{
 			activityService = (ActivityService) SpringContextUtil.getBeanByClass(ActivityService.class);
 			switchService = (SwitchService) SpringContextUtil.getBeanByClass(SwitchService.class);
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("MasterSwitchJob init exception...", e);
 		}
 	}
@@ -46,6 +45,7 @@ public class MasterSwitchJob implements Job{
 				List<ActivityEntity> activityList = this.activityService.getAllEffectiveActivity();
 				if (null != activityList && !activityList.isEmpty()) {
 					// 将有效的秒杀活动放入优先级队列
+					SchedulerContext.getActivityQueue().removeAll();
 					SchedulerContext.getActivityQueue().addAll(activityList);
 					// 秒杀活动定时调度链启动
 					SchedulerContext.scheduleChainStart();
