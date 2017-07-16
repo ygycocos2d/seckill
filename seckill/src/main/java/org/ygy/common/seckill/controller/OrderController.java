@@ -1,5 +1,6 @@
 package org.ygy.common.seckill.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +11,15 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.ygy.common.seckill.dto.OrderDTO;
+import org.ygy.common.seckill.entity.GoodsEntity;
 import org.ygy.common.seckill.entity.OrderEntity;
 import org.ygy.common.seckill.entity.UserEntity;
+import org.ygy.common.seckill.service.GoodsService;
 import org.ygy.common.seckill.service.OrderService;
 import org.ygy.common.seckill.util.Constant;
 
@@ -26,6 +31,9 @@ public class OrderController {
 	
 	@Resource
 	private OrderService orderService;
+	
+	@Resource
+	private GoodsService goodsService;
 
 	/**
 	 * 
@@ -37,12 +45,17 @@ public class OrderController {
 	public Map<String,Object> getOrderListByStatus(HttpServletRequest request,String status) {
 		Map<String,Object> result = new HashMap<String,Object>();
 		try {
-			HttpSession session = request.getSession(false);
-			if (null != session && null != session.getAttribute("user")){
-				UserEntity user = (UserEntity)(session.getAttribute("user"));
-				List<OrderEntity> orderList = this.orderService.getOrderListByUserIdAndStatus(user.getUserId(),status);
+//			HttpSession session = request.getSession(false);
+//			if (null != session && null != session.getAttribute("user")){
+//				UserEntity user = (UserEntity)(session.getAttribute("user"));
+			if(true) {
+//				List<OrderEntity> orderList = this.orderService.getOrderListByUserIdAndStatus(user.getUserId(),status);
+				
+				List<OrderEntity> orderList = this.orderService.getOrderListByUserIdAndStatus("b1c7e5b00758419aa3816dab26059e0b",status);
+				List<OrderDTO> dtos = new ArrayList<OrderDTO>();
+				this.entity2Dto(orderList,dtos);
 				result.put("status", 0);
-				result.put("data", orderList);
+				result.put("data", dtos);
 			} else {
 				result.put("status", 1);
 				result.put("msg", "请登录");
@@ -55,6 +68,23 @@ public class OrderController {
 		return result;
 	}
 	
+	private void entity2Dto(List<OrderEntity> orderList, List<OrderDTO> dtos) {
+		if (null != orderList && null != dtos) {
+			for (OrderEntity en:orderList) {
+				OrderDTO dto = new OrderDTO();
+				BeanUtils.copyProperties(en, dto);
+				GoodsEntity goods = this.goodsService.getGoodsById(dto.getGoodsId());
+				if (null != goods) {
+					dto.setGoodsName(goods.getGoodsName());
+					dto.setOriginaPrice(goods.getGoodsPrice());
+				}
+				//dto.setImgUrl("");
+				dtos.add(dto);
+			}
+		}
+		
+	}
+
 	/**
 	 * 模拟支付（改订单状态）
 	 * @param request

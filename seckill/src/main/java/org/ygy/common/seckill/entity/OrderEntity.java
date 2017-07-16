@@ -10,6 +10,10 @@ public class OrderEntity {
     private String goodsId;
 
     private Integer goodsNumber;
+    
+    private Integer goodsPrice;
+    
+    private Long orderAmount;
 
     private String status;
 
@@ -62,4 +66,20 @@ public class OrderEntity {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
+
+	public Long getOrderAmount() {
+		return orderAmount;
+	}
+
+	public void setOrderAmount(Long orderAmount) {
+		this.orderAmount = orderAmount;
+	}
+
+	public Integer getGoodsPrice() {
+		return goodsPrice;
+	}
+
+	public void setGoodsPrice(Integer goodsPrice) {
+		this.goodsPrice = goodsPrice;
+	}
 }

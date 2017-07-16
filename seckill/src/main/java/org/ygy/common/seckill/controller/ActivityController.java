@@ -30,6 +30,7 @@ import org.ygy.common.seckill.service.GoodsService;
 import org.ygy.common.seckill.service.OrderService;
 import org.ygy.common.seckill.util.AtomicIntegerExt;
 import org.ygy.common.seckill.util.Constant;
+import org.ygy.common.seckill.util.RedisLock;
 import org.ygy.common.seckill.util.RedisUtil;
 import org.ygy.common.seckill.util.StringUtil;
 
@@ -78,29 +79,40 @@ public class ActivityController {
 			UserEntity user = (UserEntity) request.getSession(true).getAttribute("user");
 			String userId = user.getUserId();
 			ActivityInfo curActivityInfo = SchedulerContext.getCurActivityInfo();
-			int num = SchedulerContext.getSucLog().getGoodsNumberOfUserInActivity(curActivityInfo.getActivityId(),userId);
-			// 是否达秒杀上限
-			if (num < curActivityInfo.getNumLimit()) {
-				AtomicIntegerExt goodsNum = curActivityInfo.getGoodsNum();
-				// goods没被秒杀完，则秒杀成功，存记录
-				if (goodsNum.getAndDecrementWhenGzero() > 0) {
-					SchedulerContext.getSucLog().setGoodsNumerOfUserInActivity(curActivityInfo.getActivityId(),
-							userId, (num+1));
-					// 我在想有没有必要启动线程来处理这步操作,只是想表达异步的意思
-//					RedisUtil.setHashMapValue(Constant.Cache.GOODS_NUMBER+curActivityInfo.getActivityId(), 
-//							SchedulerContext.getAppno(), ""+goodsNum.get());
-					RedisUtil.hincrBy(Constant.Cache.GOODS_NUMBER+curActivityInfo.getActivityId(),
-							SchedulerContext.getAppno(), -1L);
+			
+			/**
+			 * 如果是正常的单一登录，不存在并发竞争。这个锁可以不加。
+			 * 如果是脚本，单个用户多个并发的情况，要加这个锁，不过对其他账号没有并发影响.
+			 * 不过这个锁的设置、删除相对来说还是很费时的。晕！
+			 */
+			String lockKey = Constant.Cache.LOCK+curActivityInfo.getActivityId()+":"+userId;
+			RedisLock lock = new RedisLock(lockKey);
+			if (lock.acquireLockWithTimeout(RedisUtil.getConnect(),
+					5000L, 3000L)) {
+				int num = SchedulerContext.getSucLog().getGoodsNumberOfUserInActivity(curActivityInfo.getActivityId(),userId);
+				// 是否达秒杀上限
+				if (num < curActivityInfo.getNumLimit()) {
+					AtomicIntegerExt goodsNum = curActivityInfo.getGoodsNum();
+					// goods没被秒杀完，则秒杀成功，存记录
+					if (goodsNum.getAndDecrementWhenGzero() > 0) {
+						SchedulerContext.getSucLog().setGoodsNumerOfUserInActivity(curActivityInfo.getActivityId(),
+								userId, (num+1));
+						// 我在想有没有必要启动线程来处理这步操作,只是想表达异步的意思
+						RedisUtil.hincrBy(Constant.Cache.GOODS_NUMBER+curActivityInfo.getActivityId(),
+								SchedulerContext.getAppno(), -1L);
+					} else {
+						// 秒杀完了,秒杀结束
+						result.put("status", 2);
+						result.put("msg", "秒杀完了！");
+					}
 				} else {
-					// 秒杀完了,秒杀结束
-					result.put("status", 2);
-					result.put("msg", "秒杀完了！");
+					// 秒杀已达数量上限
+					result.put("status", 1);
+					result.put("msg", "秒杀已达数量上限！");
 				}
-			} else {
-				// 秒杀已达数量上限
-				result.put("status", 1);
-				result.put("msg", "秒杀已达数量上限！");
+				lock.releaseLock(RedisUtil.getConnect());
 			}
+			
 		} catch (Exception e) {
 			logger.error("[ActivityController][kill][异常]",e);
 			result.put("status", -1);

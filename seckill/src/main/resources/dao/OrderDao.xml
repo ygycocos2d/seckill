@@ -8,11 +8,13 @@
     <result column="user_id" jdbcType="VARCHAR" property="userId" />
     <result column="goods_id" jdbcType="VARCHAR" property="goodsId" />
     <result column="goods_number" jdbcType="INTEGER" property="goodsNumber" />
+    <result column="goods_price" jdbcType="INTEGER" property="goodsPrice" />
+    <result column="order_amount" jdbcType="BIGINT" property="orderAmount" />
     <result column="status" jdbcType="VARCHAR" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    order_id, user_id, goods_id, goods_number, status, create_time
+    order_id, user_id, goods_id, goods_number,goods_price,order_amount, status, create_time
   </sql>
   
   <select id="selectOrderListByUserIdAndStatus" resultMap="BaseResultMap">
@@ -45,7 +47,7 @@
   </select>
   <insert id="insertOrderBatch" parameterType="java.util.List" >
     insert into 
-    orders (order_id, user_id, goods_id, goods_number, status, create_time)
+    orders (order_id, user_id, goods_id, goods_number,goods_price,order_amount, status, create_time)
     values 
     <foreach collection="list" item="item" index="index" separator="," >   
         (
@@ -53,6 +55,8 @@
         #{item.userId,jdbcType=VARCHAR},
         #{item.goodsId,jdbcType=VARCHAR},
       	#{item.goodsNumber,jdbcType=INTEGER},
+      	#{item.goodsPrice,jdbcType=INTEGER},
+      	#{item.orderAmount,jdbcType=BIGINT},
       	#{item.status,jdbcType=VARCHAR},
       	#{item.createTime,jdbcType=TIMESTAMP}
       	)
@@ -81,10 +85,11 @@
   </delete>
   <insert id="insert" parameterType="org.ygy.common.seckill.entity.OrderEntity">
     insert into orders (order_id, user_id, goods_id, 
-      goods_number, status, create_time
+      goods_number,goods_price,order_amount, status, create_time
       )
     values (#{orderId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{goodsId,jdbcType=VARCHAR}, 
-      #{goodsNumber,jdbcType=INTEGER}, #{status,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
+      #{goodsNumber,jdbcType=INTEGER},#{goodsPrice,jdbcType=INTEGER},#{orderAmount,jdbcType=BIGINT},
+       #{status,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="org.ygy.common.seckill.entity.OrderEntity">
@@ -101,6 +106,12 @@
       </if>
       <if test="goodsNumber != null">
         goods_number,
+      </if>
+      <if test="goodsPrice != null">
+        goods_price,
+      </if>
+      <if test="orderAmount != null">
+        order_amount,
       </if>
       <if test="status != null">
         status,
@@ -122,6 +133,12 @@
       <if test="goodsNumber != null">
         #{goodsNumber,jdbcType=INTEGER},
       </if>
+      <if test="goodsPrice != null">
+        #{goodsPrice,jdbcType=INTEGER},
+      </if>
+      <if test="orderAmount != null">
+        #{orderAmount,jdbcType=BIGINT},
+      </if>
       <if test="status != null">
         #{status,jdbcType=VARCHAR},
       </if>
@@ -142,6 +159,12 @@
       <if test="goodsNumber != null">
         goods_number = #{goodsNumber,jdbcType=INTEGER},
       </if>
+      <if test="goodsPrice != null">
+        goods_price = #{goodsPrice,jdbcType=INTEGER},
+      </if>
+      <if test="orderAmount != null">
+        order_amount = #{orderAmount,jdbcType=BIGINT},
+      </if>
       <if test="status != null">
         status = #{status,jdbcType=VARCHAR},
       </if>
@@ -156,6 +179,8 @@
     set user_id = #{userId,jdbcType=VARCHAR},
       goods_id = #{goodsId,jdbcType=VARCHAR},
       goods_number = #{goodsNumber,jdbcType=INTEGER},
+      goods_price = #{goodsPrice,jdbcType=INTEGER},
+      order_amount = #{orderAmount,jdbcType=BIGINT},
       status = #{status,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where order_id = #{orderId,jdbcType=VARCHAR}

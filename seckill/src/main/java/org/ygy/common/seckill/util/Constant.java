@@ -23,6 +23,7 @@ public class Constant {
 		final String START_COMED = "startComed:";//活动开始，各应用实例平分商品数记录缓存前缀
 		final String DUMP_COMED = "dumpComed:";//某实例应用dump机，其他活着的应用实例平分其商品数记录缓存前缀
 		final String LOCK = "lock:";
+		final String USER_SESSION = "userSession:";
 		
 		
 		final String ALIVE_APP_MAP = "aliveAppMap";

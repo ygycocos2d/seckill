@@ -110,6 +110,9 @@ public class EndJob implements Job {
 					order.setOrderId(StringUtil.getClusterUUID());
 					order.setGoodsId(tempInfo.getGoodsId());
 					order.setGoodsNumber(validSeckillCount);
+					order.setGoodsPrice(tempInfo.getGoodsPrice());
+					order.setOrderAmount(
+							Long.valueOf(validSeckillCount*tempInfo.getGoodsPrice()));
 					order.setUserId(en.getKey());
 					order.setStatus("0");//创建状态
 					order.setCreateTime(curDate);
@@ -121,13 +124,13 @@ public class EndJob implements Job {
 					relationList.add(relation);
 				}
 				// 商品还库存,无效秒杀商品数+未秒杀完的商品数
-//				int toStock = tempInfo.getGoodsNum().intValue() + invalidSeckillTotalCount;
 				int seckillLeft = 0;
 				Map<String, String> goodsMap = RedisUtil.getHashMap(Constant.Cache.GOODS_NUMBER+tempInfo.getActivityId());
 				for (Entry<String, String> entry:goodsMap.entrySet()) {
 					seckillLeft += Integer.parseInt(entry.getValue()); 
 				}
 				int toStock = invalidSeckillTotalCount + seckillLeft;
+				
 				GoodsEntity goods = null;
 				ActivityGoodsInventoryLogEntity inventoryLog = null;
 				if (toStock > 0) {

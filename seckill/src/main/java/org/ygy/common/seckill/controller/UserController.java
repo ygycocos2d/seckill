@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,8 @@ import org.ygy.common.seckill.entity.SwitchEntity;
 import org.ygy.common.seckill.entity.UserEntity;
 import org.ygy.common.seckill.service.UserService;
 import org.ygy.common.seckill.util.Constant;
+import org.ygy.common.seckill.util.RedisLock;
+import org.ygy.common.seckill.util.RedisUtil;
 import org.ygy.common.seckill.util.StringUtil;
 
 @Controller
@@ -49,8 +52,27 @@ public class UserController {
 				UserEntity userEntity = userService.getByAccount(user.getUserAccount());
 				if (userEntity != null) {
 					if (userEntity.getUserPwd().equals(user.getUserPwd())) {
-						request.getSession().setAttribute("user", userEntity);
-						result.put("status", 0);
+						// 单一登录控制
+						String lockKey = Constant.Cache.LOCK+Constant.Cache.USER_SESSION+userEntity.getUserId();
+						RedisLock lock = new RedisLock(lockKey);
+						if (lock.acquireLockWithTimeout(RedisUtil.getConnect(),
+								5000L, 3000L)) {
+							String sessionId = RedisUtil.get(Constant.Cache.USER_SESSION+userEntity.getUserId());
+							if (StringUtil.isEmpty(sessionId)) {//未登录
+								HttpSession session = request.getSession(true);
+								session.setAttribute("user", userEntity);
+								RedisUtil.setEx(Constant.Cache.USER_SESSION+userEntity.getUserId(),
+										session.getId(), 1800);//和session过期时间一致
+								result.put("status", 0);
+								result.put("hh", session.getId());
+								result.put("msg", "登录成功");
+							} else {//已登录
+								result.put("status", 0);
+								result.put("hh", sessionId);
+								result.put("msg", "已登录");
+							}
+							lock.releaseLock(RedisUtil.getConnect());
+						}
 					} else {
 						result.put("status", 1);
 						result.put("msg", "密码错误");
@@ -76,7 +98,12 @@ public class UserController {
 	@ResponseBody
 	public Map<String,Object> logout(HttpServletRequest request) {
 		Map<String,Object> result = new HashMap<String,Object>();
-		request.getSession().invalidate();
+		HttpSession session = request.getSession(false);
+		if (null != session) {
+			UserEntity user = (UserEntity) session.getAttribute("user");
+			RedisUtil.delete(Constant.Cache.USER_SESSION+user.getUserId());
+			session.invalidate();
+		}
 		result.put("status", 0);
 		return result;
 	}
@@ -131,7 +158,6 @@ public class UserController {
 	@ResponseBody
 	public Map<String,Object> getSwitch(String id) {
 		Map<String,Object> result = new HashMap<String,Object>();
-//		SwitchEntity en = switchDao.selectByPrimaryKey(id);
 		SwitchEntity en = switchDao.selectByType(Constant.SECKILL_SWITCH);
 		result.put("status", en.getStatus());
 		return result;
