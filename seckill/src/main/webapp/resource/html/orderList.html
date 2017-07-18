@@ -12,7 +12,7 @@
 	<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
 	<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	</head>
-	<body style="margin:0 20% 0 20%">
+	<body style="margin:20px 20% 0 20%">
 		<div class="btn-group">
 		  <button type="button" class="btn btn-default" onclick='getOrderListByStatus()'><font size="4">所有订单</font></button>
 		  <button type="button" class="btn btn-default" onclick='getOrderListByStatus(0)'><font size="4">待付款</font></button>
@@ -54,7 +54,7 @@
 			dataIndex: 'goodsName',
 			title: '<strong>宝贝</strong>',
 			render:function(record,text){
-				return '<img alt="goods" style="width:100;height:100" src="/seckill/resource/html/1.jpg" />'+text;
+				return '<img alt="goods" style="width:100;height:100" src="/seckill/resource/images/1.jpg" />'+text;
 			}
 		},{
 			dataIndex: 'goodsNumber',
@@ -86,7 +86,8 @@
 			title: '<strong>操作</strong>',
 			render:function(record,text){
 				if (text==0) {
-					return '<button type="button" class="btn btn-default btn-big">去付款</button>';
+					var orderId = record.orderId;
+ 					return '<button type="button" class="btn btn-default btn-big" onclick=pay("'+orderId+'")>去付款</button>'; 
 				}
 				return '';
 			}
@@ -134,23 +135,44 @@
 		
 		function getOrderListByStatus(status) {
 			$.ajax({
-             type: "GET",
-             url: '/seckill/order/getOrderListByStatus',
-             data:{
-             	status:status
-             },
-             async: false,
-             error: function(request) {
-                 alert("Connection error");
-             },
-             success: function(data) {
-                 if(data.status === 0){
-                 	table.html(generator(columns, data.data));
-                 }else{
-                 	alert('查询失败');
-                 }
-             }
-         });
+             	type: "GET",
+             	url: '/seckill/order/getOrderListByStatus',
+             	data:{
+             		status:status
+             	},
+             	async: false,
+             	error: function(request) {
+                 	alert("Connection error");
+             	},
+             	success: function(data) {
+                 	if(data.status === 0){
+                 		table.html(generator(columns, data.data));
+                 	}else{
+                 		alert(data.msg);
+                 	}
+             	}
+         	});
 		}
+		function pay(orderId) {
+			$.ajax({
+	             type: "POST",
+	             url: '/seckill/order/pay',
+	             data:{
+	            	 orderId:orderId
+	             },
+	             async: false,
+	             error: function(request) {
+	                 alert("Connection error");
+	             },
+	             success: function(data) {
+	                 if(data.status === 0){
+	                	 alert('支付成功！');
+	                	 getOrderListByStatus();//刷页面
+	                 }else{
+	                 	alert(data.msg);
+	                 }
+	             }
+	        }); 
+		} 
 	</script>
 </html>

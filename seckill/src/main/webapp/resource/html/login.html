@@ -3,7 +3,9 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>秒杀登录</title>
-  <link rel="stylesheet" type="text/css" href="http://unpkg.com/iview/dist/styles/iview.css">
+  <link rel="stylesheet" type="text/css" href="../css/ionicons.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/iview.css">
+  <script type="text/javascript" src="../js/jquery-1.9.1.js"></script>
   <script type="text/javascript" src="http://vuejs.org/js/vue.min.js"></script>
   <script type="text/javascript" src="http://unpkg.com/iview/dist/iview.min.js"></script>
   <style type="text/css">
@@ -13,8 +15,16 @@
   		margin: 300px auto
   	}
   	#app .login{
-  		text-align: center;
+  		text-align: left;
   	}
+    #app .login-sumbit{
+      position: relative;
+    }
+    #app .login-sumbit a{
+      position: absolute;
+      bottom: 6px;
+      right: 0px;
+     }
   </style>
 </head>
 <body>
@@ -28,8 +38,10 @@
       <i-input type="password" placeholder="Password" v-model="password" style="margin-top:20px;">
         <Icon type="ios-locked-outline" slot="prepend"></Icon>
       </i-input>
-      <i-button type="info" style="margin-top:20px;width:182px;" @click="login()">登录</i-button>
-      <a>注册</a>
+      <div class="login-sumbit">
+        <i-button type="info" style="margin-top:20px;width:182px;" @click="login()">登录</i-button>
+        <a>注册</a>
+      </div>
 		</div>
 	</Row>
 </div>
@@ -43,26 +55,32 @@
 		},
 		methods:{
 			login:function(){
-				var that = this;
-				var reqData = {
-					username:that.username,
-					password:that.password
-				}
-				that.$http.post('/seckill/user/login', reqData, function(data, textStatus, xhr) {
-					/*optional stuff to do after success */
-          if (data.status == '0') {
-            //登陆成功
-            window.location.href="../html/secKillList.html"
-          }else{
-            if (data.status == '1') {
-              //入参不合理
+        var that = this;
+        //userAccount-账号，userPwd-密码
+        var reqData = {
+          userAccount:that.username,
+          userPwd:that.password
+        }
+          $.ajax({
+          url: "/seckill/user/login",
+          contentType:"application/json",
+          dataType:"json",
+          type: 'POST',
+          data:JSON.stringify(reqData),
+          success: function(data){
+            if (data.status == '0') {
+              //登陆成功
+              window.location.href="../html/secKillList.html"
             }else{
-              //系统异常
-            };
+              if (data.status == '1') {
+                //入参不合理
+              }else{
+                //系统异常p
+              };
+            }
           }
-				});
-				
-			}
+        })
+      }
 		}
   })
 </script>

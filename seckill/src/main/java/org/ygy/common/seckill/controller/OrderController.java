@@ -45,13 +45,13 @@ public class OrderController {
 	public Map<String,Object> getOrderListByStatus(HttpServletRequest request,String status) {
 		Map<String,Object> result = new HashMap<String,Object>();
 		try {
-//			HttpSession session = request.getSession(false);
-//			if (null != session && null != session.getAttribute("user")){
-//				UserEntity user = (UserEntity)(session.getAttribute("user"));
-			if(true) {
-//				List<OrderEntity> orderList = this.orderService.getOrderListByUserIdAndStatus(user.getUserId(),status);
+			HttpSession session = request.getSession(false);
+			if (null != session && null != session.getAttribute("user")){
+				UserEntity user = (UserEntity)(session.getAttribute("user"));
+//			if(true) {
+				List<OrderEntity> orderList = this.orderService.getOrderListByUserIdAndStatus(user.getUserId(),status);
 				
-				List<OrderEntity> orderList = this.orderService.getOrderListByUserIdAndStatus("b1c7e5b00758419aa3816dab26059e0b",status);
+//				List<OrderEntity> orderList = this.orderService.getOrderListByUserIdAndStatus("b1c7e5b00758419aa3816dab26059e0b",status);
 				List<OrderDTO> dtos = new ArrayList<OrderDTO>();
 				this.entity2Dto(orderList,dtos);
 				result.put("status", 0);

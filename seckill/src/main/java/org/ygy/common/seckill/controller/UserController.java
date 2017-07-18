@@ -58,8 +58,8 @@ public class UserController {
 						if (lock.acquireLockWithTimeout(RedisUtil.getConnect(),
 								5000L, 3000L)) {
 							String sessionId = RedisUtil.get(Constant.Cache.USER_SESSION+userEntity.getUserId());
+							HttpSession session = request.getSession(true);
 							if (StringUtil.isEmpty(sessionId)) {//未登录
-								HttpSession session = request.getSession(true);
 								session.setAttribute("user", userEntity);
 								RedisUtil.setEx(Constant.Cache.USER_SESSION+userEntity.getUserId(),
 										session.getId(), 1800);//和session过期时间一致
@@ -67,9 +67,15 @@ public class UserController {
 								result.put("hh", session.getId());
 								result.put("msg", "登录成功");
 							} else {//已登录
-								result.put("status", 0);
-								result.put("hh", sessionId);
-								result.put("msg", "已登录");
+								if (null != session.getAttribute("user")) {
+									result.put("status", 0);
+									result.put("hh", sessionId);
+									result.put("msg", "已登录");
+								} else {
+									result.put("status", 2);
+									result.put("hh", sessionId);
+									result.put("msg", "已在别处登录");
+								}
 							}
 							lock.releaseLock(RedisUtil.getConnect());
 						}

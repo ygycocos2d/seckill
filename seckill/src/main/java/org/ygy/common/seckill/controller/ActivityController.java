@@ -1,11 +1,13 @@
 package org.ygy.common.seckill.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.ygy.common.seckill.dto.ActivityDTO;
+import org.ygy.common.seckill.dto.ActivityExtEntity;
 import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.entity.ActivityGoodsInventoryLogEntity;
 import org.ygy.common.seckill.entity.GoodsEntity;
@@ -455,9 +458,26 @@ public class ActivityController {
 	public Map<String,Object> getActivityListInStartup() {
 		Map<String,Object> result = new HashMap<String,Object>();
 		try {
+			List<ActivityEntity> resultList = new ArrayList<ActivityEntity>();
+			int num = this.getCurActivityGoodsNumer();
+			if (num != -1) {
+				ActivityInfo curActivity = SchedulerContext.getCurActivityInfo();
+				ActivityExtEntity entity = new ActivityExtEntity();
+				this.info2Entity(curActivity,entity);
+				// 进行中的活动从缓存中取剩余的商品数
+				entity.setLeftGoodsNumber(num);
+				resultList.add(entity);
+			}
 			List<ActivityEntity> activityList = this.activityService.getAllEffectiveActivity();
+			if (!resultList.isEmpty()) {
+				resultList.addAll(activityList);
+				result.put("has", true);
+			} else {
+				resultList = activityList;
+				result.put("has", false);
+			}
 			result.put("status", 0);
-			result.put("data", activityList);
+			result.put("data", resultList);
 		} catch (Exception e) {
 			logger.error("[ActivityController][getActivityListInStartup][异常]",e);
 			result.put("status", -1);
@@ -476,11 +496,15 @@ public class ActivityController {
 		Map<String,Object> result = new HashMap<String,Object>();
 		try {
 			// 只有总开关开启，才能查到进行中的秒杀活动
-			ActivityInfo curActivity = SchedulerContext.getCurActivityInfo();
-			if (null != curActivity && curActivity.getStartTime() <= System.currentTimeMillis()
-					&& curActivity.getEndTime() >= System.currentTimeMillis()) {
+			int num = this.getCurActivityGoodsNumer();
+			if (num != -1) {
+				ActivityInfo curActivity = SchedulerContext.getCurActivityInfo();
+				ActivityExtEntity entity = new ActivityExtEntity();
+				this.info2Entity(curActivity,entity);
+				// 进行中活动从缓存中取剩余商品数
+				entity.setLeftGoodsNumber(num);
 				result.put("status", 0);
-				result.put("data", curActivity);
+				result.put("data", entity);
 			} else {
 				result.put("status", 1);
 				result.put("msg", "当前没有进行的秒杀活动");
@@ -493,6 +517,40 @@ public class ActivityController {
 		return result;
 	}
 	
+	private int getCurActivityGoodsNumer() {
+		int num = 0;
+		ActivityInfo curActivity = SchedulerContext.getCurActivityInfo();
+		if (null != curActivity && curActivity.getStartTime() <= System.currentTimeMillis()
+				&& curActivity.getEndTime() >= System.currentTimeMillis()) {
+			// 获取当前秒杀活动中所有应用实例处理的商品数:Map<appno,商品数>
+			String goodsNumberKey = Constant.Cache.GOODS_NUMBER+curActivity.getActivityId();
+			Map<String, String> goodsNumberMap = RedisUtil.getHashMap(goodsNumberKey);
+			for (Entry<String, String> en:goodsNumberMap.entrySet()) {
+				num += Integer.parseInt(en.getValue());
+			}
+		} else {
+			num = -1;
+		}
+		return num;
+	}
+	
+	private void info2Entity(ActivityInfo curActivity, ActivityExtEntity entity) {
+		if (null != curActivity && null != entity) {
+			entity.setActivityId(curActivity.getActivityId());
+			entity.setGroupId(curActivity.getActivityGid());
+			entity.setDescribt(curActivity.getDescribt());
+			entity.setGoodsId(curActivity.getGoodsId());
+			entity.setGoodsNumber(curActivity.getGoodsNum().get());
+			entity.setGoodsPrice(curActivity.getGoodsPrice());
+			entity.setPayDelay(curActivity.getPayDelay());
+			entity.setLimitNumber(curActivity.getNumLimit());
+			entity.setStatus(curActivity.getStatus());
+			entity.setStartTime(new Date(curActivity.getStartTime()));
+			entity.setEndTime(new Date(curActivity.getEndTime()));
+		}
+		
+	}
+
 	/**
 	 * 校验新增、修改活动时活动设置的正确性
 	 * @param dto
