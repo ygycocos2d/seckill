@@ -10,8 +10,10 @@ import java.util.Properties;
 import org.ygy.common.seckill.entity.ActivityEntity;
 import org.ygy.common.seckill.successlog.ISuccessLog;
 import org.ygy.common.seckill.util.ActivityQueue;
+import org.ygy.common.seckill.util.Constant;
 import org.ygy.common.seckill.util.FileUtil;
 import org.ygy.common.seckill.util.QuartzUtil;
+import org.ygy.common.seckill.util.RedisUtil;
 import org.ygy.common.seckill.util.StringUtil;
 
 public class SchedulerContext {
@@ -124,14 +126,31 @@ public class SchedulerContext {
 	}
 
 	public static void scheduleChainStart() {
-		if (null == curActivityInfo) {
-			if (!activityQueue.isEmpty()) {
-				ActivityEntity entity = activityQueue.getHeaderNotDel();
-				String name = entity.getActivityId() + "_start";
-				String group = entity.getGroupId() + "_start";
-				quartzUtil.add(StartJob.class, name, group, new Date());
+		if (null != curActivityInfo) {
+			// 未开始的活动
+			if (curActivityInfo.getStartTime() > System.currentTimeMillis()) {
+				String name = curActivityInfo.getActivityId() + "_end";
+				String group = curActivityInfo.getActivityGid() + "_end";
+				quartzUtil.delete(name, group);
+				RedisUtil.delete(Constant.Cache.GOODS_NUMBER+curActivityInfo.getActivityId(),
+						Constant.Cache.START_COMED+curActivityInfo.getActivityId());
+				curActivityInfo = null;
 			}
 		}
+		if (!activityQueue.isEmpty()) {
+			ActivityEntity entity = activityQueue.getHeaderNotDel();
+			String name = entity.getActivityId() + "_start";
+			String group = entity.getGroupId() + "_start";
+			quartzUtil.add(StartJob.class, name, group, new Date());
+		}
+//		if (null == curActivityInfo) {
+//			if (!activityQueue.isEmpty()) {
+//				ActivityEntity entity = activityQueue.getHeaderNotDel();
+//				String name = entity.getActivityId() + "_start";
+//				String group = entity.getGroupId() + "_start";
+//				quartzUtil.add(StartJob.class, name, group, new Date());
+//			}
+//		}
 	}
 
 	public static ISuccessLog getSucLog() {

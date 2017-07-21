@@ -279,7 +279,14 @@ public class RedisUtil {
     
     public static void main(String[] args) {
     	
-    	hincrBy("goodsNumber:a0397652140c40deacba69cbeabfe973","1",-11L);
+    	
+    	System.out.println(new Date(1500554760000L));
+    	
+    	
+    	
+    	
+    	
+//    	hincrBy("goodsNumber:a0397652140c40deacba69cbeabfe973","1",-11L);
     	
 //    	getAndSet("","");
 //    	String handled = RedisUtil.getHashMapValue(Constant.SUCC_HANDLED_FLAG, "55446");

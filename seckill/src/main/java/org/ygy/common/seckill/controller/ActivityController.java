@@ -37,6 +37,8 @@ import org.ygy.common.seckill.util.RedisLock;
 import org.ygy.common.seckill.util.RedisUtil;
 import org.ygy.common.seckill.util.StringUtil;
 
+import com.alibaba.fastjson.JSONObject;
+
 /**
  * 规定：
  * 1、状态为启动时，进行商品校验（该示例只进行库存校验和减库存操作）
@@ -129,6 +131,7 @@ public class ActivityController {
 	 * @param request
 	 * @return status -1-系统异常，0-成功，1-该订单不存在
 	 */
+	@Deprecated
 	@RequestMapping("pay")
 	@ResponseBody
 	public Map<String,Object> pay(HttpServletRequest request,String orderId) {
@@ -517,17 +520,42 @@ public class ActivityController {
 		return result;
 	}
 	
+	
+	@RequestMapping("start")
+	@ResponseBody
+	public Map<String,Object> start() {
+		Map<String,Object> result = new HashMap<String,Object>();
+		try {
+			// 获取有效的秒杀活动
+			List<ActivityEntity> activityList = this.activityService.getAllEffectiveActivity();
+			if (null != activityList && !activityList.isEmpty()) {
+				// 将有效的秒杀活动放入优先级队列
+				SchedulerContext.getActivityQueue().removeAll();
+				SchedulerContext.getActivityQueue().addAll(activityList);
+				// 秒杀活动定时调度链启动
+				SchedulerContext.scheduleChainStart();
+			}
+			result.put("status", 0);
+		} catch (Exception e) {
+			logger.error("[ActivityController][start][异常]",e);
+			result.put("status", -1);
+			result.put("msg", "系统异常");
+		}
+		return result;
+	}
+	
 	private int getCurActivityGoodsNumer() {
 		int num = 0;
 		ActivityInfo curActivity = SchedulerContext.getCurActivityInfo();
-		if (null != curActivity && curActivity.getStartTime() <= System.currentTimeMillis()
+		logger.info("--------------"+JSONObject.toJSONString(curActivity));
+		if (null != curActivity &&curActivity.getStartTime() <= System.currentTimeMillis()
 				&& curActivity.getEndTime() >= System.currentTimeMillis()) {
-			// 获取当前秒杀活动中所有应用实例处理的商品数:Map<appno,商品数>
-			String goodsNumberKey = Constant.Cache.GOODS_NUMBER+curActivity.getActivityId();
-			Map<String, String> goodsNumberMap = RedisUtil.getHashMap(goodsNumberKey);
-			for (Entry<String, String> en:goodsNumberMap.entrySet()) {
-				num += Integer.parseInt(en.getValue());
-			}
+				// 获取当前秒杀活动中所有应用实例处理的商品数:Map<appno,商品数>
+				String goodsNumberKey = Constant.Cache.GOODS_NUMBER+curActivity.getActivityId();
+				Map<String, String> goodsNumberMap = RedisUtil.getHashMap(goodsNumberKey);
+				for (Entry<String, String> en:goodsNumberMap.entrySet()) {
+					num += Integer.parseInt(en.getValue());
+				}
 		} else {
 			num = -1;
 		}
